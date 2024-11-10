@@ -5,4 +5,11 @@
 //  Created by 고영민 on 11/11/24.
 //
 
-import Foundation
+import UIKit
+
+extension NSObject {
+    
+    static var className: String {
+        NSStringFromClass(self.classForCoder()).components(separatedBy: ".").last!
+    }
+}

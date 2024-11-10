@@ -5,4 +5,13 @@
 //  Created by 고영민 on 11/11/24.
 //
 
-import Foundation
+import UIKit
+
+extension UIStackView {
+    
+    func addArrangedSubviews(_ views: UIView...) {
+        for view in views {
+            self.addArrangedSubview(view)
+        }
+    }
+}
