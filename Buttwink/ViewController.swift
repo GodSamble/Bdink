@@ -11,7 +11,7 @@ final class ViewController: UIViewController {
     
     private let nameLabel: UILabel = {
         let label = UILabel()
-        label.text = "솝트에 오신 여러분 환영합니다!"
+        label.text = "test"
         return label
     }()
 

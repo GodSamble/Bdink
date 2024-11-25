@@ -1,5 +1,5 @@
 {
-  "originHash" : "2e6d85dacea7d98713cc2eb78ad8bf12464451e744213c26df0798a916338a41",
+  "originHash" : "26747cfe69aa372ff7a4b2f9fc4b9b4603c5c874cd88c1525ff1c88eda05a57f",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -11,12 +11,30 @@
       }
     },
     {
+      "identity" : "buttwinkdesignsystem",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/GodSamble/ButtwinkDesignSystem",
+      "state" : {
+        "branch" : "main",
+        "revision" : "01c0f5c2c8d7e64e6b18ab6b7015e35500cd0c3f"
+      }
+    },
+    {
       "identity" : "kingfisher",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/onevcat/Kingfisher.git",
       "state" : {
-        "revision" : "c0940e241945e6378c01fbd45fd3815579d47ef5",
-        "version" : "8.1.0"
+        "revision" : "b6256f191b4c1d8d09f4df94bae69e5ac6e42c81",
+        "version" : "8.1.1"
+      }
+    },
+    {
+      "identity" : "lottie-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/airbnb/lottie-ios.git",
+      "state" : {
+        "revision" : "fe4c6fe3a0aa66cdeb51d549623c82ca9704b9a5",
+        "version" : "4.5.0"
       }
     },
     {
