@@ -7,12 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1D7BB1E22CF472C00023AC1C /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 1D7BB1E12CF472C00023AC1C /* Kingfisher */; };
+		1D7BB1E52CF472CE0023AC1C /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1D7BB1E42CF472CE0023AC1C /* SnapKit */; };
+		1D7BB1EA2CF472DA0023AC1C /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 1D7BB1E92CF472DA0023AC1C /* DesignSystem */; };
 		1D999D452CE0BADA004A4029 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D999D442CE0BADA004A4029 /* AppDelegate.swift */; };
 		1D999D472CE0BADA004A4029 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D999D462CE0BADA004A4029 /* SceneDelegate.swift */; };
 		1D999D492CE0BADA004A4029 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D999D482CE0BADA004A4029 /* ViewController.swift */; };
 		1D999D512CE0BADC004A4029 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 1D999D502CE0BADC004A4029 /* Base */; };
-		1D999D722CE0E288004A4029 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 1D999D712CE0E288004A4029 /* Kingfisher */; };
-		1D999D752CE0E2B0004A4029 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1D999D742CE0E2B0004A4029 /* SnapKit */; };
 		1D999D7B2CE11337004A4029 /* UIView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D999D7A2CE11337004A4029 /* UIView+.swift */; };
 		1D999D7D2CE113A7004A4029 /* Date+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D999D7C2CE113A7004A4029 /* Date+.swift */; };
 		1D999D7F2CE113E8004A4029 /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D999D7E2CE113E8004A4029 /* String+.swift */; };
@@ -25,7 +26,6 @@
 		1D999D8D2CE115EF004A4029 /* adjusted+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D999D8C2CE115EF004A4029 /* adjusted+.swift */; };
 		1D999D8F2CE11618004A4029 /* NSObject+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D999D8E2CE11618004A4029 /* NSObject+.swift */; };
 		1D999D912CE11797004A4029 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D999D902CE11797004A4029 /* TabBarController.swift */; };
-		1DDA3FA12CF3821E0001EA85 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 1DDA3FA02CF3821E0001EA85 /* DesignSystem */; };
 		1DDA3FA32CF384440001EA85 /* TabBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDA3FA22CF384440001EA85 /* TabBarItem.swift */; };
 /* End PBXBuildFile section */
 
@@ -57,9 +57,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1DDA3FA12CF3821E0001EA85 /* DesignSystem in Frameworks */,
-				1D999D722CE0E288004A4029 /* Kingfisher in Frameworks */,
-				1D999D752CE0E2B0004A4029 /* SnapKit in Frameworks */,
+				1D7BB1E22CF472C00023AC1C /* Kingfisher in Frameworks */,
+				1D7BB1E52CF472CE0023AC1C /* SnapKit in Frameworks */,
+				1D7BB1EA2CF472DA0023AC1C /* DesignSystem in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -317,9 +317,9 @@
 			);
 			name = Buttwink;
 			packageProductDependencies = (
-				1D999D712CE0E288004A4029 /* Kingfisher */,
-				1D999D742CE0E2B0004A4029 /* SnapKit */,
-				1DDA3FA02CF3821E0001EA85 /* DesignSystem */,
+				1D7BB1E12CF472C00023AC1C /* Kingfisher */,
+				1D7BB1E42CF472CE0023AC1C /* SnapKit */,
+				1D7BB1E92CF472DA0023AC1C /* DesignSystem */,
 			);
 			productName = Buttwink;
 			productReference = 1D999D412CE0BADA004A4029 /* Buttwink.app */;
@@ -350,11 +350,11 @@
 			);
 			mainGroup = 1D999D382CE0BADA004A4029;
 			packageReferences = (
-				1D999D702CE0E287004A4029 /* XCRemoteSwiftPackageReference "Kingfisher" */,
-				1D999D732CE0E2B0004A4029 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				1D999D782CE0E2D1004A4029 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				1D999D792CE0E36D004A4029 /* XCRemoteSwiftPackageReference "Moya" */,
-				1DDA3F9F2CF3821E0001EA85 /* XCRemoteSwiftPackageReference "ButtwinkDesignSystem" */,
+				1D7BB1E02CF472C00023AC1C /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				1D7BB1E32CF472CE0023AC1C /* XCRemoteSwiftPackageReference "SnapKit" */,
+				1D7BB1E82CF472DA0023AC1C /* XCRemoteSwiftPackageReference "ButtwinkDesignSystem" */,
 			);
 			productRefGroup = 1D999D422CE0BADA004A4029 /* Products */;
 			projectDirPath = "";
@@ -619,20 +619,28 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		1D999D702CE0E287004A4029 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+		1D7BB1E02CF472C00023AC1C /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 8.1.0;
+				minimumVersion = 8.1.1;
 			};
 		};
-		1D999D732CE0E2B0004A4029 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+		1D7BB1E32CF472CE0023AC1C /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.7.1;
+			};
+		};
+		1D7BB1E82CF472DA0023AC1C /* XCRemoteSwiftPackageReference "ButtwinkDesignSystem" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/GodSamble/ButtwinkDesignSystem";
+			requirement = {
+				branch = main;
+				kind = branch;
 			};
 		};
 		1D999D782CE0E2D1004A4029 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
@@ -651,30 +659,22 @@
 				minimumVersion = 15.0.3;
 			};
 		};
-		1DDA3F9F2CF3821E0001EA85 /* XCRemoteSwiftPackageReference "ButtwinkDesignSystem" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/GodSamble/ButtwinkDesignSystem";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		1D999D712CE0E288004A4029 /* Kingfisher */ = {
+		1D7BB1E12CF472C00023AC1C /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 1D999D702CE0E287004A4029 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			package = 1D7BB1E02CF472C00023AC1C /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
 		};
-		1D999D742CE0E2B0004A4029 /* SnapKit */ = {
+		1D7BB1E42CF472CE0023AC1C /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 1D999D732CE0E2B0004A4029 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			package = 1D7BB1E32CF472CE0023AC1C /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
 		};
-		1DDA3FA02CF3821E0001EA85 /* DesignSystem */ = {
+		1D7BB1E92CF472DA0023AC1C /* DesignSystem */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 1DDA3F9F2CF3821E0001EA85 /* XCRemoteSwiftPackageReference "ButtwinkDesignSystem" */;
+			package = 1D7BB1E82CF472DA0023AC1C /* XCRemoteSwiftPackageReference "ButtwinkDesignSystem" */;
 			productName = DesignSystem;
 		};
 /* End XCSwiftPackageProductDependency section */
