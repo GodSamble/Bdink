@@ -25,10 +25,11 @@
 		1D999D8D2CE115EF004A4029 /* adjusted+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D999D8C2CE115EF004A4029 /* adjusted+.swift */; };
 		1D999D8F2CE11618004A4029 /* NSObject+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D999D8E2CE11618004A4029 /* NSObject+.swift */; };
 		1D999D912CE11797004A4029 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D999D902CE11797004A4029 /* TabBarController.swift */; };
+		1DDA3FA12CF3821E0001EA85 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 1DDA3FA02CF3821E0001EA85 /* DesignSystem */; };
+		1DDA3FA32CF384440001EA85 /* TabBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDA3FA22CF384440001EA85 /* TabBarItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1D8DBF532CE4CC2B00B21EE0 /* DesignSystem */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = DesignSystem; path = ../../../../../.Trash/DesignSystem; sourceTree = "<group>"; };
 		1D999D412CE0BADA004A4029 /* Buttwink.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Buttwink.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D999D442CE0BADA004A4029 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1D999D462CE0BADA004A4029 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -48,6 +49,7 @@
 		1D999D8C2CE115EF004A4029 /* adjusted+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "adjusted+.swift"; sourceTree = "<group>"; };
 		1D999D8E2CE11618004A4029 /* NSObject+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSObject+.swift"; sourceTree = "<group>"; };
 		1D999D902CE11797004A4029 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
+		1DDA3FA22CF384440001EA85 /* TabBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1DDA3FA12CF3821E0001EA85 /* DesignSystem in Frameworks */,
 				1D999D722CE0E288004A4029 /* Kingfisher in Frameworks */,
 				1D999D752CE0E2B0004A4029 /* SnapKit in Frameworks */,
 			);
@@ -211,6 +214,7 @@
 			isa = PBXGroup;
 			children = (
 				1D999D902CE11797004A4029 /* TabBarController.swift */,
+				1DDA3FA22CF384440001EA85 /* TabBarItem.swift */,
 			);
 			path = Scene;
 			sourceTree = "<group>";
@@ -292,7 +296,6 @@
 		1D999D922CE119DB004A4029 /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				1D8DBF532CE4CC2B00B21EE0 /* DesignSystem */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -316,6 +319,7 @@
 			packageProductDependencies = (
 				1D999D712CE0E288004A4029 /* Kingfisher */,
 				1D999D742CE0E2B0004A4029 /* SnapKit */,
+				1DDA3FA02CF3821E0001EA85 /* DesignSystem */,
 			);
 			productName = Buttwink;
 			productReference = 1D999D412CE0BADA004A4029 /* Buttwink.app */;
@@ -350,6 +354,7 @@
 				1D999D732CE0E2B0004A4029 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				1D999D782CE0E2D1004A4029 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				1D999D792CE0E36D004A4029 /* XCRemoteSwiftPackageReference "Moya" */,
+				1DDA3F9F2CF3821E0001EA85 /* XCRemoteSwiftPackageReference "ButtwinkDesignSystem" */,
 			);
 			productRefGroup = 1D999D422CE0BADA004A4029 /* Products */;
 			projectDirPath = "";
@@ -382,6 +387,7 @@
 				1D999D912CE11797004A4029 /* TabBarController.swift in Sources */,
 				1D999D872CE1151B004A4029 /* UILabel+.swift in Sources */,
 				1D999D8B2CE115B8004A4029 /* UITextField+.swift in Sources */,
+				1DDA3FA32CF384440001EA85 /* TabBarItem.swift in Sources */,
 				1D999D832CE1148F004A4029 /* UIViewController+.swift in Sources */,
 				1D999D812CE11466004A4029 /* URL+.swift in Sources */,
 				1D999D7D2CE113A7004A4029 /* Date+.swift in Sources */,
@@ -645,6 +651,14 @@
 				minimumVersion = 15.0.3;
 			};
 		};
+		1DDA3F9F2CF3821E0001EA85 /* XCRemoteSwiftPackageReference "ButtwinkDesignSystem" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/GodSamble/ButtwinkDesignSystem";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -657,6 +671,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1D999D732CE0E2B0004A4029 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		1DDA3FA02CF3821E0001EA85 /* DesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1DDA3F9F2CF3821E0001EA85 /* XCRemoteSwiftPackageReference "ButtwinkDesignSystem" */;
+			productName = DesignSystem;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
