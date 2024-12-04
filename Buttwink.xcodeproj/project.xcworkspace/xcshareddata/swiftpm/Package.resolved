@@ -1,5 +1,5 @@
 {
-  "originHash" : "5804664efa97a33a30af35c1afe228140361eeb27f14d6399f0bd5352814e309",
+  "originHash" : "16c0f291e224b7d756a7c1b9cd72c6aa1b5fe52499e944b57ab69213bcd9540c",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -16,7 +16,7 @@
       "location" : "https://github.com/GodSamble/ButtwinkDesignSystem",
       "state" : {
         "branch" : "main",
-        "revision" : "01c0f5c2c8d7e64e6b18ab6b7015e35500cd0c3f"
+        "revision" : "5106681dea140eb812d0209cbf92f7ac7a96a434"
       }
     },
     {
