@@ -74,7 +74,27 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         setupLayout()
         setupDataSource()
         bindViewModel()
+        testWeatherAPI()
     }
+      
+    
+    private func testWeatherAPI() {
+        let testService = TestService()
+
+        // 예시로 사용할 위도와 경도 값 (원하는 값으로 변경 가능)
+        let latitude: Double = 44.34
+        let longitude: Double = 10.99
+
+        // API 호출
+        testService.getTotalTest(lat: latitude, lon: longitude) { response in
+            if let response = response {
+                print("Weather Data: \(response)")
+            } else {
+                print("Failed to fetch data.")
+            }
+        }
+    }
+    
     
     func bindViewModel() {
         let input = MypageViewModel.Input(viewDidLoad: rx.viewWillAppear.asObservable().take(1))
