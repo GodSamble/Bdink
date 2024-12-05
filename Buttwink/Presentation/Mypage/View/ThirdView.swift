@@ -9,29 +9,41 @@ import UIKit
 import RxSwift
 import RxCocoa
 import SnapKit
+import DesignSystem
 
-class ThirdView: BaseCollectionViewCell<Any> {
+final class ThirdView: BaseCollectionViewCell<Any> {
+    
+    // MARK: - Property
+    
     static let identifier: String = "ThirdView"
     private var bag = DisposeBag()
     
+    // MARK: - UI Components
+
     private let imageView: UIImageView = {
         let view = UIImageView()
-        view.backgroundColor = .yellow
+        view.image = .Sample.sample1
+        view.sizeToFit()
         return view
     }()
     
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        bag = DisposeBag()
+    // MARK: - Life Cycle
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setLayout()
     }
     
-    override func layout() {
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Methods
+    
+    private func setLayout() {
         [imageView].forEach { addSubview($0) }
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
             make.height.equalTo(imageView.snp.width).multipliedBy(0.5) // 2:1 비율
         }
-        
-        
     }
 }

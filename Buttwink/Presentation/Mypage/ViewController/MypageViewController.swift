@@ -46,6 +46,7 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
     private var currentSnapshot = NSDiffableDataSourceSnapshot<SectionLayoutKind, DetailInfoSectionItem>()
     private var dataSource: UICollectionViewDiffableDataSource<SectionLayoutKind, DetailInfoSectionItem>!
     
+    private var tags: [String] = ["첫 번째", "두 번째", "세 번째"]
     private lazy var collectionView: UICollectionView = {
         let collectionViewLayout = createLayout()
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
@@ -56,7 +57,7 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         collectionView.register(ThumbnailView.self, forCellWithReuseIdentifier: ThumbnailView.identifier)
         collectionView.register(ThirdView.self, forCellWithReuseIdentifier: ThirdView.identifier)
         collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderView.identifier)
-        
+        collectionView.isScrollEnabled = true
         return collectionView
     }()
     
@@ -71,10 +72,11 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupLayout()
+        setLayout()
         setupDataSource()
         bindViewModel()
         testWeatherAPI()
+        populateTags()
     }
       
     
@@ -107,7 +109,7 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
     
     // MARK: - Layout
     
-    private func setupLayout() {
+    private func setLayout() {
         view.backgroundColor = .clear
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints {
@@ -122,25 +124,25 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
             collectionView: collectionView,
             cellProvider: { (collectionView, indexPath, item) -> UICollectionViewCell? in
                 switch item {
-                case .Tag(let Tag):
+                case .Tag(let tagStrings):
                     guard let cell = collectionView.dequeueReusableCell(
                         withReuseIdentifier: TagView.identifier,
                         for: indexPath
                     ) as? TagView else {
                         return nil
                     }
-                    cell.configure(with: Tag)
+                    cell.configure(with: tagStrings)
                     return cell
-                case .Thumbnail(let Thumbnail):
+                case .Thumbnail(_):
                     guard let cell = collectionView.dequeueReusableCell(
                         withReuseIdentifier: ThumbnailView.identifier,
                         for: indexPath
                     ) as? ThumbnailView else {
                         return nil
                     }
-                    cell.configure(with: Thumbnail)
+//                    cell.configure(with: Thumbnail)
                     return cell
-                case .Third(let Third):
+                case .Third(_):
                     guard let cell = collectionView.dequeueReusableCell(
                         withReuseIdentifier: ThirdView.identifier,
                         for: indexPath
@@ -187,6 +189,20 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         return layout
     }
     
+    
+    private func populateTags() {
+        let tagItems = tags.map { DetailInfoSectionItem.Tag([$0]) }
+        let thumbnailItems = [DetailInfoSectionItem.Thumbnail([])]
+        let thirdItems = [DetailInfoSectionItem.Third([1.0, 2.0, 3.0])]
+
+        currentSnapshot.appendSections([.Tag, .Thumbnail, .Third])
+        currentSnapshot.appendItems(tagItems, toSection: .Tag)
+        currentSnapshot.appendItems(thumbnailItems, toSection: .Thumbnail)
+        currentSnapshot.appendItems(thirdItems, toSection: .Third)
+        dataSource.apply(currentSnapshot, animatingDifferences: true)
+    }
+
+    
     private func createTagViewSection(withHeader: Bool) -> NSCollectionLayoutSection { //✅
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
@@ -195,8 +211,8 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .estimated(271), // 가로로 텍스트 길이에 따른 변화니까.
-            heightDimension: .estimated(33)
+            widthDimension: .estimated(420),
+            heightDimension: .estimated(30)
         )
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,

@@ -7,62 +7,45 @@
 
 import UIKit
 import RxSwift
+import DesignSystem
 import RxCocoa
 import RxDataSources
 
-class MypageViewModel: CommonViewModelType {
-    // Clean Arc 
-//    init() {
-//        loadInitialData()
-//    }
-    
+final class MypageViewModel: CommonViewModelType {
     private let sectionsRelay = BehaviorRelay<[SectionLayoutKind: [DetailInfoSectionItem]]>(value: [:])
-    
     private let disposeBag = DisposeBag()
-    
+    private var tagButtons: [UIButton] = []
+
     // MARK: Input
-    struct Input { //입력 받는거
+    struct Input {
         let viewDidLoad: Observable<Void>
     }
-    //MARK: PublishSubject
     
     // MARK: Output
     struct Output {
         let dataSource: Observable<[DetailInfoSectionItem]>
     }
-
+    
+    private var dummyData: [DetailInfoSectionItem] = []
+    
+    init() {
+        // 더미 데이터를 한번만 초기화
+        dummyData = [
+            .Tag(["Dummy Tag 1", "Dummy Tag 2", "Dummy Tag 2"]),
+            .Thumbnail([UIImage(named: "Sample"), UIImage(named: "Sample2")].compactMap { $0 }),
+            .Third([1.0, 2.0, 3.0])
+        ]
+    }
+    
     func transform(input: Input) -> Output {
-        
-        let data = input.viewDidLoad
-            .map { _ in
-                // loadInitialData()에서 준비한 데이터를 사용
-                self.sectionsRelay.value
+        let dataSource = input.viewDidLoad
+            .map { [weak self] _ -> [DetailInfoSectionItem] in
+                return self?.dummyData ?? []
             }
-            .do(onNext: { sections in
-                // 필요하면 데이터를 처리
-                print("Loaded initial data: \(sections)")
-            })
-        
-        let dataSource = data.map { dto -> [DetailInfoSectionItem] in
-            var result = [DetailInfoSectionItem]()
-            
-            // 섹션을 순회하면서 DetailInfoSectionItem을 생성
-            SectionLayoutKind.allCases.forEach { section in
-                switch section {
-                case .ThumbnailView:
-                    result.append(.thumbnail("Default Thumbnail"))
-                case .TagView:
-                    result.append(.tag("Default Tag"))
-                case .ThirdView:
-                    result.append(.third(3.0))
-                }
-            }
-            return result
-        }
         
         return Output(dataSource: dataSource)
     }
 }
-    
+
 
 

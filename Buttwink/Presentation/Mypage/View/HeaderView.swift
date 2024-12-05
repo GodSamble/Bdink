@@ -10,9 +10,12 @@ import DesignSystem
 
 final class HeaderView: UICollectionReusableView {
     
-    static let identifier = "HeaderView"
+    // MARK: - Property
     
+    static let identifier = "HeaderView"
     var closeButtonTappedClosure: (() -> Void)?
+    
+    // MARK: - UI Components
     
     private var headerLabel: UILabel = {
         let label = UILabel()
@@ -32,16 +35,18 @@ final class HeaderView: UICollectionReusableView {
         self.closeButtonTappedClosure?()
     }
     
+    // MARK: - Life Cycle
     override init(frame: CGRect) {
         super.init(frame: frame)
-        layout()
+        setLayout()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func layout() {
+    // MARK: - Methods
+    private func setLayout() {
         [headerLabel, moreButton].forEach { addSubview($0) }
         headerLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview()
