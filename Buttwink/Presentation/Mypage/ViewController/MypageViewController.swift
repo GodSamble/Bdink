@@ -13,10 +13,10 @@ import RxDataSources
 import SnapKit
 
 
-//MARK: Section Data = Model
+// MARK: - Section Data
 enum DetailInfoSectionItem: Hashable {
     case Tag([String])
-    case Thumbnail([UIImage]) // URL이나 이미지 이름
+    case Thumbnail([UIImage])
     case Third([Double])
     
     public func getSectionLayoutKind() -> SectionLayoutKind {
@@ -27,8 +27,7 @@ enum DetailInfoSectionItem: Hashable {
         }
     }
 }
-
-//MARK: Item
+// MARK: - Item
 enum SectionLayoutKind: Int, CaseIterable, Hashable {
     case Tag
     case Thumbnail
@@ -131,7 +130,7 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
                     ) as? TagView else {
                         return nil
                     }
-                    cell.configure(with: tagStrings)
+                    cell.configure(with: self.tags)
                     return cell
                 case .Thumbnail(_):
                     guard let cell = collectionView.dequeueReusableCell(

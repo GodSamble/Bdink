@@ -12,10 +12,15 @@ import RxCocoa
 import RxDataSources
 
 final class MypageViewModel: CommonViewModelType {
-    private let sectionsRelay = BehaviorRelay<[SectionLayoutKind: [DetailInfoSectionItem]]>(value: [:])
+    private let repository: RepositoryInterface_test
+    private let sectionsRelay = BehaviorRelay<[DetailInfoSectionItem]>(value: [])
     private let disposeBag = DisposeBag()
     private var tagButtons: [UIButton] = []
-
+    
+    init(repository: RepositoryInterface_test) {
+        self.repository = repository
+    }
+    
     // MARK: Input
     struct Input {
         let viewDidLoad: Observable<Void>
@@ -28,19 +33,27 @@ final class MypageViewModel: CommonViewModelType {
     
     private var dummyData: [DetailInfoSectionItem] = []
     
-    init() {
-        // 더미 데이터를 한번만 초기화
-        dummyData = [
-            .Tag(["Dummy Tag 1", "Dummy Tag 2", "Dummy Tag 2"]),
-            .Thumbnail([UIImage(named: "Sample"), UIImage(named: "Sample2")].compactMap { $0 }),
-            .Third([1.0, 2.0, 3.0])
-        ]
-    }
-    
     func transform(input: Input) -> Output {
         let dataSource = input.viewDidLoad
-            .map { [weak self] _ -> [DetailInfoSectionItem] in
-                return self?.dummyData ?? []
+            .flatMapLatest { [weak self] _ -> Observable<[DetailInfoSectionItem]> in
+                guard let self = self else { return .just([]) }
+                return self.repository.fetchData(lat: 37.7749, lon: -122.4194)
+                    .map { welcome -> [DetailInfoSectionItem] in
+                        var result = [DetailInfoSectionItem]()
+                        // Case 1: Tag - weather의 main 값을 추출하여 [String] 생성
+                        let tags = welcome.weather.map { $0.main }
+                        result.append(.Tag(tags))
+                        
+                        // Case 2: Thumbnail - weather의 icon 값을 UIImage로 변환
+                        let thumbnails = welcome.weather.compactMap { UIImage(named: $0.icon) }
+                        result.append(.Thumbnail(thumbnails))
+                        
+                        // Case 3: Third - main의 온도 값(temp, tempMin, tempMax) 추출하여 [Double] 생성
+                        let thirdValues = [welcome.main.temp, welcome.main.tempMin, welcome.main.tempMax]
+                        result.append(.Third(thirdValues))
+                        return result
+                    }
+                    .catchAndReturn([])
             }
         
         return Output(dataSource: dataSource)

@@ -1,8 +1,8 @@
 //
-//  TestResponseDTO.swift
+//  Entity_test.swift
 //  Buttwink
 //
-//  Created by 고영민 on 12/4/24.
+//  Created by 고영민 on 12/10/24.
 //
 
 import Foundation
