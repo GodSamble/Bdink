@@ -8,6 +8,6 @@
 import Foundation
 import RxSwift
 
-protocol RespositoryInterface_test {
+protocol RepositoryInterface_test {
     func data() -> Observable<Welcome>
 }

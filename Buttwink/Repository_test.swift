@@ -7,35 +7,33 @@
 
 import Foundation
 import RxSwift
+import Moya
 
-protocol RepositoryInterface_test {
-    func fetchData(lat: Double, lon: Double) -> Observable<Welcome>
-}
 
 final class Repository_test: RepositoryInterface_test {
-    private let service: TestService
     
-    init(service: TestService) {
+    private let service: TestService
+    private let lat: Double
+    private let lon: Double
+    
+    init(service: TestService, lat: Double, lon: Double) {
         self.service = service
+        self.lat = lat
+        self.lon = lon
     }
     
-    func fetchData(lat: Double, lon: Double) -> Observable<Welcome> {
-        return Observable.create { [weak self] observer in
-            guard let self = self else {
-                observer.onError(NSError(domain: "RepositoryError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Self is nil"]))
-                return Disposables.create()
-            }
-            
-            self.service.getTotalTest(lat: lat, lon: lon) { response in
-                if let data = response?.data {
-                    observer.onNext(data)
-                    observer.onCompleted()
-                } else {
-                    observer.onError(NSError(domain: "RepositoryError", code: -2, userInfo: [NSLocalizedDescriptionKey: "Failed to fetch weather data"]))
+    func data() -> Observable<Welcome> {
+        return service.getTotalTest(lat: lat, lon: lon)
+            .flatMap { response in
+                // data가 nil일 경우 에러 발생
+                guard let data = response.data else {
+                    return Observable<Welcome>.error(NSError(domain: "RepositoryError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Data is nil"]))
                 }
+                return Observable.just(data) // data가 존재하면 Observable<Welcome> 반환
             }
-            return Disposables.create()
-        }
+            .catch { error in
+                // 에러 처리, Observable<Welcome>을 반환해야 함
+                return Observable<Welcome>.error(error) // Observable<Welcome>을 반환
+            }
     }
 }
-

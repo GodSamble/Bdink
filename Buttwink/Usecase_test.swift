@@ -9,17 +9,17 @@ import Foundation
 import RxSwift
 
 protocol UseCaseProtocol_test {
-    func execute() -> Observable<Welcome>
+    func data() -> Observable<Welcome>
 }
 
 final class UseCase_test: UseCaseProtocol_test {
-    private let repositoryInterface: RespositoryInterface_test
+    private let repositoryInterface: RepositoryInterface_test
     
-    init(repositoryInterface: RespositoryInterface_test) {
+    init(repositoryInterface: RepositoryInterface_test) {
         self.repositoryInterface = repositoryInterface
     }
     
-    func execute() -> Observable<Welcome> {
+    func data() -> Observable<Welcome> {
         return self.repositoryInterface.data()
     }
 }

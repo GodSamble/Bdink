@@ -12,10 +12,10 @@ import RxCocoa
 import RxDataSources
 
 final class MypageViewModel: CommonViewModelType {
+    let datasourceRelay = BehaviorRelay<[DetailInfoSectionItem]>(value: [])
+    
     private let repository: RepositoryInterface_test
-    private let sectionsRelay = BehaviorRelay<[DetailInfoSectionItem]>(value: [])
     private let disposeBag = DisposeBag()
-    private var tagButtons: [UIButton] = []
     
     init(repository: RepositoryInterface_test) {
         self.repository = repository
@@ -31,34 +31,45 @@ final class MypageViewModel: CommonViewModelType {
         let dataSource: Observable<[DetailInfoSectionItem]>
     }
     
-    private var dummyData: [DetailInfoSectionItem] = []
+     var dummyData: [DetailInfoSectionItem] = [
+        .Tag(["Sunny", "Rainy", "Cloudy"]),
+        .Thumbnail([
+            UIImage.Sample.sample1 ?? UIImage(), // Use a default image if "sample" is not found
+            UIImage.Sample.sample1 ?? UIImage()  // Same here for the second image
+        ]),
+        .Third([30.0, 22.0, 35.0])
+    ]
+    
     
     func transform(input: Input) -> Output {
-        let dataSource = input.viewDidLoad
-            .flatMapLatest { [weak self] _ -> Observable<[DetailInfoSectionItem]> in
-                guard let self = self else { return .just([]) }
-                return self.repository.fetchData(lat: 37.7749, lon: -122.4194)
-                    .map { welcome -> [DetailInfoSectionItem] in
-                        var result = [DetailInfoSectionItem]()
-                        // Case 1: Tag - weather의 main 값을 추출하여 [String] 생성
-                        let tags = welcome.weather.map { $0.main }
-                        result.append(.Tag(tags))
-                        
-                        // Case 2: Thumbnail - weather의 icon 값을 UIImage로 변환
-                        let thumbnails = welcome.weather.compactMap { UIImage(named: $0.icon) }
-                        result.append(.Thumbnail(thumbnails))
-                        
-                        // Case 3: Third - main의 온도 값(temp, tempMin, tempMax) 추출하여 [Double] 생성
-                        let thirdValues = [welcome.main.temp, welcome.main.tempMin, welcome.main.tempMax]
-                        result.append(.Third(thirdValues))
-                        return result
+            input.viewDidLoad
+                .flatMapLatest { [weak self] _ -> Observable<[DetailInfoSectionItem]> in
+                    guard let self = self else { return .just([]) }
+
+                    // Check if datasourceRelay already has data
+                    if !self.datasourceRelay.value.isEmpty {
+                        return .just(self.datasourceRelay.value) // Return cached data
                     }
-                    .catchAndReturn([])
-            }
-        
-        return Output(dataSource: dataSource)
+
+                    return self.repository.data()
+                        .do(onNext: { data in
+                            print("Received data: \(data)") // 데이터 확인
+                        })
+                        .map { welcome -> [DetailInfoSectionItem] in
+                            print("Parsed welcome data: \(welcome)")  // welcome 데이터 확인
+                            let result = [DetailInfoSectionItem]()
+                            // 데이터 변환 작업을 여기에 추가
+                            return result
+                        }
+                        .catchAndReturn(self.dummyData) // 실패 시 dummyData 반환
+                        .do(onNext: { result in
+                            
+                            self.datasourceRelay.accept(result) // Cache the result
+                        })
+                }
+                .bind(to: datasourceRelay)
+                .disposed(by: disposeBag)
+
+            return Output(dataSource: datasourceRelay.asObservable())
+        }
     }
-}
-
-
-

@@ -46,4 +46,15 @@ final class ThirdView: BaseCollectionViewCell<Any> {
             make.height.equalTo(imageView.snp.width).multipliedBy(0.5) // 2:1 비율
         }
     }
+    
+    public func configure(_ images: [UIImage?], _ count: Int) {
+        if let img = images.first ?? nil {
+            imageView.image = img
+//            titleLabel.text = "들어간다 \(count)"
+            imageView.backgroundColor = .clear
+        } else {
+            imageView.image = UIImage(systemName: "sample")?.resizeWithWidth(width: 200)?.withTintColor(.buttwink_gray200)
+//            titleLabel.text = "000"
+        }
+    }
 }
