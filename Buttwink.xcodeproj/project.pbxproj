@@ -66,6 +66,13 @@
 		1DE1355B2CF890E500D9F469 /* ThirdView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE1355A2CF890E500D9F469 /* ThirdView.swift */; };
 		1DE1355D2CFB1FC600D9F469 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE1355C2CFB1FC600D9F469 /* HeaderView.swift */; };
 		1DFB78F32D0085E600534317 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 1DFB78F22D0085E600534317 /* Moya */; };
+		78956CFF2D185C680074D80B /* BoxOfficeTargetType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78956CF62D185C680074D80B /* BoxOfficeTargetType.swift */; };
+		78956D002D185C680074D80B /* MoviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78956CFB2D185C680074D80B /* MoviewViewModel.swift */; };
+		78956D012D185C680074D80B /* ServiceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78956CF72D185C680074D80B /* ServiceType.swift */; };
+		78956D022D185C680074D80B /* MovieView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78956CFD2D185C680074D80B /* MovieView.swift */; };
+		78956D032D185C680074D80B /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78956CF42D185C680074D80B /* Model.swift */; };
+		78956D042D185C680074D80B /* MovieViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78956CF92D185C680074D80B /* MovieViewController.swift */; };
+		78956D072D185CBD0074D80B /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 78956D062D185CBD0074D80B /* Then */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -133,6 +140,12 @@
 		1DDA3FA22CF384440001EA85 /* TabBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarItem.swift; sourceTree = "<group>"; };
 		1DE1355A2CF890E500D9F469 /* ThirdView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdView.swift; sourceTree = "<group>"; };
 		1DE1355C2CFB1FC600D9F469 /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
+		78956CF42D185C680074D80B /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		78956CF62D185C680074D80B /* BoxOfficeTargetType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoxOfficeTargetType.swift; sourceTree = "<group>"; };
+		78956CF72D185C680074D80B /* ServiceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceType.swift; sourceTree = "<group>"; };
+		78956CF92D185C680074D80B /* MovieViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieViewController.swift; sourceTree = "<group>"; };
+		78956CFB2D185C680074D80B /* MoviewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviewViewModel.swift; sourceTree = "<group>"; };
+		78956CFD2D185C680074D80B /* MovieView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,6 +160,7 @@
 				1DE135592CF882CB00D9F469 /* RxDataSources in Frameworks */,
 				1D7BB2002CF5D7AC0023AC1C /* RxCocoa in Frameworks */,
 				1DB5B7742D0AFEBA00E80768 /* Sentry in Frameworks */,
+				78956D072D185CBD0074D80B /* Then in Frameworks */,
 				1DFB78F32D0085E600534317 /* Moya in Frameworks */,
 				1DB5B76F2D0AFABB00E80768 /* RxMoya in Frameworks */,
 				1D7BB1E52CF472CE0023AC1C /* SnapKit in Frameworks */,
@@ -314,6 +328,7 @@
 			isa = PBXGroup;
 			children = (
 				1D7BB1EF2CF5C5ED0023AC1C /* Mypage */,
+				78956CFE2D185C680074D80B /* Movie */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -390,6 +405,51 @@
 			path = Base;
 			sourceTree = "<group>";
 		};
+		78956CF52D185C680074D80B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				78956CF42D185C680074D80B /* Model.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		78956CF82D185C680074D80B /* NetWork */ = {
+			isa = PBXGroup;
+			children = (
+				78956CF62D185C680074D80B /* BoxOfficeTargetType.swift */,
+				78956CF72D185C680074D80B /* ServiceType.swift */,
+			);
+			path = NetWork;
+			sourceTree = "<group>";
+		};
+		78956CFA2D185C680074D80B /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				78956CF92D185C680074D80B /* MovieViewController.swift */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		78956CFC2D185C680074D80B /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				78956CFB2D185C680074D80B /* MoviewViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		78956CFE2D185C680074D80B /* Movie */ = {
+			isa = PBXGroup;
+			children = (
+				78956CF52D185C680074D80B /* Model */,
+				78956CF82D185C680074D80B /* NetWork */,
+				78956CFA2D185C680074D80B /* ViewController */,
+				78956CFC2D185C680074D80B /* ViewModel */,
+				78956CFD2D185C680074D80B /* MovieView.swift */,
+			);
+			path = Movie;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -419,6 +479,7 @@
 				1DB5B76E2D0AFABB00E80768 /* RxMoya */,
 				1DB5B7732D0AFEBA00E80768 /* Sentry */,
 				1DB5B7772D0AFEBA00E80768 /* SentrySwiftUI */,
+				78956D062D185CBD0074D80B /* Then */,
 			);
 			productName = Buttwink;
 			productReference = 1D999D412CE0BADA004A4029 /* Buttwink.app */;
@@ -457,6 +518,7 @@
 				1DFB78F12D0085AF00534317 /* XCRemoteSwiftPackageReference "Moya" */,
 				1D0D98B12D09ABFA00ACB167 /* XCRemoteSwiftPackageReference "Swinject" */,
 				1DB5B7722D0AFEBA00E80768 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				78956D052D185CBD0074D80B /* XCRemoteSwiftPackageReference "Then" */,
 			);
 			productRefGroup = 1D999D422CE0BADA004A4029 /* Products */;
 			projectDirPath = "";
@@ -502,6 +564,12 @@
 				1D0D98A92D07683800ACB167 /* BaseRxCollectionView.swift in Sources */,
 				1D5D33942D0D8D7000559069 /* GetServiceRx.swift in Sources */,
 				1D999D8B2CE115B8004A4029 /* UITextField+.swift in Sources */,
+				78956CFF2D185C680074D80B /* BoxOfficeTargetType.swift in Sources */,
+				78956D002D185C680074D80B /* MoviewViewModel.swift in Sources */,
+				78956D012D185C680074D80B /* ServiceType.swift in Sources */,
+				78956D022D185C680074D80B /* MovieView.swift in Sources */,
+				78956D032D185C680074D80B /* Model.swift in Sources */,
+				78956D042D185C680074D80B /* MovieViewController.swift in Sources */,
 				1DDA3FA32CF384440001EA85 /* TabBarItem.swift in Sources */,
 				1D999D832CE1148F004A4029 /* UIViewController+.swift in Sources */,
 				1D24D6032CF7F46C006157FD /* ThumbnailView.swift in Sources */,
@@ -818,6 +886,14 @@
 				minimumVersion = 15.0.3;
 			};
 		};
+		78956D052D185CBD0074D80B /* XCRemoteSwiftPackageReference "Then" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devxoul/Then.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -875,6 +951,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1DFB78F12D0085AF00534317 /* XCRemoteSwiftPackageReference "Moya" */;
 			productName = Moya;
+		};
+		78956D062D185CBD0074D80B /* Then */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 78956D052D185CBD0074D80B /* XCRemoteSwiftPackageReference "Then" */;
+			productName = Then;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
