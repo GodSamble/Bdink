@@ -36,7 +36,7 @@ enum TabBarItem: CaseIterable {
         switch self {
         case .lecture: return DIContainer.shared.container.resolve(MypageViewController.self)!
         case .search: return ViewController()
-        case .premium:       return ViewController()
+        case .premium:       return MovieViewController()
         case .mypage:        return ViewController()
         }
     }
