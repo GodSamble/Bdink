@@ -10,5 +10,5 @@ import Foundation
 import Moya
 
 struct Providers {
-    static let calendarProvider = MoyaProvider<MJTargetType>()
-}
+    static let calendarProvider = MoyaProvider<MJTargetType>(plugins: [NetworkLoggerPlugin()])
+    }

@@ -39,17 +39,19 @@ extension MJTargetType: TargetType {
     var task: Moya.Task {
         switch self {
         case .getMovieData(let date):
-            return .requestParameters(parameters: ["key": Config.apiKey, "targetDt": date], encoding: URLEncoding.default)
+            return .requestParameters(
+                parameters: ["key": Config.apiKey, "targetDt": date],
+                encoding: URLEncoding.default
+            )
         }
     }
     
     var headers: [String: String]? {
-        return ["Content-Type": "application/json"]
+        // GET 요청에는 특별히 필요하지 않으므로 제거
+        return nil
     }
     
     var validationType: ValidationType {
         return .successCodes
     }
 }
-
-
