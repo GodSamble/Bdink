@@ -38,6 +38,7 @@ enum TabBarItem: CaseIterable {
         case .search: return ViewController()
         case .premium:       return ViewController()
         case .mypage:        return MJViewController(viewModel: MJViewModel())
+          
         }
     }
 }
