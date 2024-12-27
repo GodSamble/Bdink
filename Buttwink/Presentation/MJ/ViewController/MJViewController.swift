@@ -13,10 +13,10 @@ final class MJViewController: UIViewController {
     private let viewModel: MJViewModel
     private let disposeBag = DisposeBag()
     
-    private var movieData: [BoxOffice] = [] // ViewModel 데이터를 저장할 변수
+    private var movieData: [BoxOffice] = []
     private let rootView = MJView()
     
-    // MARK: - Initializer
+    // MARK: - Init
     
     init(viewModel: MJViewModel) {
         self.viewModel = viewModel
@@ -57,7 +57,7 @@ final class MJViewController: UIViewController {
         rootView.collectionView.register(MJCell.self, forCellWithReuseIdentifier: MJCell.className)
     }
     
-    // MARK: - Bind ViewModel
+    // MARK: - Bind
     
     private func bindViewModel() {
         Task {
@@ -70,6 +70,7 @@ final class MJViewController: UIViewController {
             }
         }
     }
+    
 }
 
 extension MJViewController: UICollectionViewDelegate {}

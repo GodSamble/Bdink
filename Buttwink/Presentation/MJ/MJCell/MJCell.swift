@@ -22,7 +22,6 @@ final class MJCell: UICollectionViewCell {
         return label
     }()
     
-    
     private let openDate: UILabel = {
         let label = UILabel()
         label.text = "기본 텍스트"
@@ -47,7 +46,8 @@ final class MJCell: UICollectionViewCell {
 
 extension MJCell {
     private func setHierarchy() {
-        backgroundColor = .white
+        backgroundColor = .buttwink_gray200
+        
         contentView.addSubviews(
             titleLabel,
             openDate
@@ -57,12 +57,12 @@ extension MJCell {
     private func setLayout() {
         titleLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.leading.equalToSuperview().offset(24.adjusted)
+            $0.horizontalEdges.equalToSuperview()
         }
         
         openDate.snp.makeConstraints {
-            $0.centerY.equalToSuperview()
-            $0.leading.equalTo(titleLabel.snp.trailing).offset(24.adjusted)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
+            $0.horizontalEdges.equalToSuperview()
         }
     }
 }

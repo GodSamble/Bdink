@@ -17,7 +17,7 @@ protocol ViewModelType {
 
 final class MJViewModel: ViewModelType {
     
-    let provider = Providers.calendarProvider
+    let provider = Providers.movieProvider
     
     struct Input {
         let viewDidLoad: Void
@@ -29,12 +29,11 @@ final class MJViewModel: ViewModelType {
     
     func transform(input: Input, disposeBag: DisposeBag) async -> Output {
         do {
-            // 네트워크 요청 수행
             let movieData = try await fetchMovieData(date: getOneWeekAgoDate())
-            print(movieData)
+//            print(movieData)
             return Output(movieData: movieData)
         } catch {
-            print("Error fetching movie data: \(error)")
+            print("Error \(error)")
             return Output(movieData: [])
         }
     }

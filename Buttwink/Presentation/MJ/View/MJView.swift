@@ -19,6 +19,13 @@ final class MJView: UIView {
         return view
     }()
     
+    private let bannerLabel: UILabel = {
+        let label = UILabel()
+        label.text = "배너"
+        label.textColor = .black
+        return label
+    }()
+    
     lazy var collectionView: UICollectionView = {
         let layout = createLayout()
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -53,6 +60,7 @@ final class MJView: UIView {
     
     private func setHierarchy() {
         self.addSubviews(logoView, collectionView)
+        logoView.addSubview(bannerLabel)
     }
     
     private func setLayout() {
@@ -60,6 +68,10 @@ final class MJView: UIView {
             $0.top.equalTo(safeAreaLayoutGuide)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(52.adjustedH)
+        }
+        
+        bannerLabel.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
         
         collectionView.snp.makeConstraints {
@@ -71,21 +83,24 @@ final class MJView: UIView {
     
     private func createLayout() -> UICollectionViewLayout {
         let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
+            widthDimension: .fractionalWidth(0.5),
             heightDimension: .estimated(150)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-
+        
+        item.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(150)
+            heightDimension: .estimated(100)
         )
+        
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-
+        
         let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 0
+        section.interGroupSpacing = 10
         section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
-
+        
         return UICollectionViewCompositionalLayout(section: section)
     }
     

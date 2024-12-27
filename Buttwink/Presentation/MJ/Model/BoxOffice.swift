@@ -7,24 +7,21 @@
 
 import Foundation
 
-// 최상위 응답 구조체
 struct BoxOfficeResponse: Codable {
     let boxOfficeResult: BoxOfficeResult
 }
 
-// BoxOfficeResult 구조체
 struct BoxOfficeResult: Codable {
-    let boxofficeType: String          // 박스오피스 타입
-    let showRange: String              // 조회 날짜 범위
-    let dailyBoxOfficeList: [BoxOffice] // 일별 박스오피스 목록
+    let boxofficeType: String
+    let showRange: String
+    let dailyBoxOfficeList: [BoxOffice]
 }
 
-// BoxOffice 구조체 (기존 제공된 코드 수정)
 struct BoxOffice: Codable {
-    let rank: String                   // 순위
-    let movieName: String              // 영화명
-    let openDate: String               // 개봉일
-    let audienceCount: String          // 해당일 관객수
+    let rank: String
+    let movieName: String
+    let openDate: String
+    let audienceCount: String
     
     enum CodingKeys: String, CodingKey {
         case rank

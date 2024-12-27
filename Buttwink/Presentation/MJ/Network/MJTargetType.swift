@@ -47,7 +47,6 @@ extension MJTargetType: TargetType {
     }
     
     var headers: [String: String]? {
-        // GET 요청에는 특별히 필요하지 않으므로 제거
         return nil
     }
     
