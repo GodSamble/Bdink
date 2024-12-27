@@ -2,7 +2,7 @@
 //  MovieViewController.swift
 //  Buttwink
 //
-//  Created by 이지훈 on 12/22/24.
+//  Created by 이지훈 on 12/25/24.
 //
 
 import UIKit
@@ -36,8 +36,27 @@ final class MovieViewController: UIViewController {
         $0.tintColor = .gray
     }
     
-    // MARK: - Initialization
-    init(viewModel: MovieViewModelType = MovieViewModel()) {
+    convenience init() {
+        let networkService = DefaultBoxOfficeNetworkService()
+        let boxOfficeMapper = DefaultBoxOfficeMapper()
+        let movieRepository = DefaultMovieRepository(
+            networkService: networkService,
+            mapper: boxOfficeMapper
+        )
+        let fetchMoviesUseCase = DefaultFetchMoviesUseCase(
+            movieRepository: movieRepository
+        )
+        let presentationMapper = DefaultMoviePresentationMapper()
+        
+        let viewModel = MovieViewModel(
+            fetchMoviesUseCase: fetchMoviesUseCase,
+            moviePresentationMapper: presentationMapper
+        )
+        
+        self.init(viewModel: viewModel)
+    }
+    
+    init(viewModel: MovieViewModelType) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -158,12 +177,4 @@ extension String {
         formatter.numberStyle = .decimal
         return formatter.string(from: NSNumber(value: number)) ?? self
     }
-}
-
-extension DateFormatter {
-    static let yyyyMMdd: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyyMMdd"
-        return formatter
-    }()
 }
