@@ -29,9 +29,9 @@ final class BoxOfficeService: BoxOfficeServiceProtocol {
                         let movies = boxOfficeResponse.boxOfficeResult.dailyBoxOfficeList.map { movie in
                             MovieModel(
                                 id: movie.rank,
-                                movieName: movie.movieNm,
-                                audienceCount: movie.audiCnt,
-                                openDate: movie.openDt
+                                movieName: movie.movieName,
+                                audienceCount: movie.audienceCount,
+                                openDate: movie.openDate
                             )
                         }
                         continuation.resume(returning: movies)

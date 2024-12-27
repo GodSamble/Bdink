@@ -17,10 +17,10 @@ struct MovieModel: Hashable {
 struct BoxOfficeResponse: Codable {
     let boxOfficeResult: BoxOfficeResult
 }
-
-struct BoxOfficeResult: Codable {
-    let dailyBoxOfficeList: [DailyBoxOffice]
-}
+//
+//struct BoxOfficeResult: Codable {
+//    let dailyBoxOfficeList: [DailyBoxOffice]
+//}
 
 struct DailyBoxOffice: Codable {
     let rank: String

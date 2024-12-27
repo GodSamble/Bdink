@@ -7,9 +7,9 @@
 
 import Foundation
 
-struct BoxOfficeResponse: Codable {
-    let boxOfficeResult: BoxOfficeResult
-}
+//struct BoxOfficeResponse: Codable {
+//    let boxOfficeResult: BoxOfficeResult
+//}
 
 struct BoxOfficeResult: Codable {
     let boxofficeType: String
