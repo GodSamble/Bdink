@@ -9,7 +9,7 @@ import UIKit
 
 extension Date {
     func getTodayDateToString(_ format: String) -> String {
-        var dateFormatter = DateFormatter()
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format
         let today = dateFormatter.string(from: Date())
         return today

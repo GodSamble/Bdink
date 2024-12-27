@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -147,6 +147,10 @@
 		78956CFB2D185C680074D80B /* MoviewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviewViewModel.swift; sourceTree = "<group>"; };
 		78956CFD2D185C680074D80B /* MovieView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		710CC7B22D19949F00AC5FA3 /* MJ */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = MJ; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		1D999D3E2CE0BADA004A4029 /* Frameworks */ = {
@@ -327,6 +331,7 @@
 		1D999D5D2CE0DB6D004A4029 /* Presentation */ = {
 			isa = PBXGroup;
 			children = (
+				710CC7B22D19949F00AC5FA3 /* MJ */,
 				1D7BB1EF2CF5C5ED0023AC1C /* Mypage */,
 				78956CFE2D185C680074D80B /* Movie */,
 			);
@@ -465,6 +470,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				710CC7B22D19949F00AC5FA3 /* MJ */,
 			);
 			name = Buttwink;
 			packageProductDependencies = (
