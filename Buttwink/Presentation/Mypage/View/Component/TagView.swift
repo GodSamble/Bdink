@@ -12,6 +12,10 @@ import RxCocoa
 import SnapKit
 import DesignSystem
 
+struct tagViewModel {
+    let tag : Weather
+}
+
 final class TagView: BaseCollectionViewCell<Any> {
     
     // MARK: - Property
@@ -29,8 +33,7 @@ final class TagView: BaseCollectionViewCell<Any> {
     }
     
     // MARK: - Methods
-    func configure() {
-        // 기존 버튼 삭제
+    func configure(with tags: [String]) {
         tagButtons.forEach { $0.removeFromSuperview() }
         tagButtons.removeAll()
         
@@ -38,13 +41,12 @@ final class TagView: BaseCollectionViewCell<Any> {
         
         for tag in tags {
             let tagButton = UIButton()
-            tagButton.setTitle(tag, for: .normal) // 이미 tag는 tags의 요소
+            tagButton.setTitle(tag, for: .normal)
             tagButton.setTitleColor(.white, for: .normal)
             tagButton.backgroundColor = .black
             tagButton.layer.cornerRadius = 8
             tagButton.layer.borderColor = UIColor.buttwink_gray600.cgColor
             tagButton.titleLabel?.font = UIFont.systemFont(ofSize: 14)
-            tagButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
             
             contentView.addSubview(tagButton)
             tagButtons.append(tagButton)
@@ -61,4 +63,5 @@ final class TagView: BaseCollectionViewCell<Any> {
             previousButton = tagButton
         }
     }
+
 }

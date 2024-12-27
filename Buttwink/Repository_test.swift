@@ -11,6 +11,23 @@ import Moya
 
 
 final class Repository_test: RepositoryInterface_test {
+    func dataAsync() async throws -> Welcome {
+          return try await withCheckedThrowingContinuation { continuation in
+              data()
+                  .subscribe { event in
+                      switch event {
+                      case .next(let data):
+                          continuation.resume(returning: data)
+                      case .error(let error):
+                          continuation.resume(throwing: error)
+                      case .completed:
+                          break
+                      }
+                  }
+                  .disposed(by: DisposeBag())
+          }
+      }
+    
     
     private let service: TestService
     private let lat: Double
@@ -25,15 +42,13 @@ final class Repository_test: RepositoryInterface_test {
     func data() -> Observable<Welcome> {
         return service.getTotalTest(lat: lat, lon: lon)
             .flatMap { response in
-                // data가 nil일 경우 에러 발생
                 guard let data = response.data else {
                     return Observable<Welcome>.error(NSError(domain: "RepositoryError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Data is nil"]))
                 }
-                return Observable.just(data) // data가 존재하면 Observable<Welcome> 반환
+                return Observable.just(data)
             }
             .catch { error in
-                // 에러 처리, Observable<Welcome>을 반환해야 함
-                return Observable<Welcome>.error(error) // Observable<Welcome>을 반환
+                return Observable<Welcome>.error(error)
             }
     }
 }

@@ -12,8 +12,8 @@ import RxCocoa
 import RxDataSources
 
 final class MypageViewModel: CommonViewModelType {
-    let datasourceRelay = BehaviorRelay<[DetailInfoSectionItem]>(value: [])
     
+    let datasourceRelay = BehaviorRelay<[DetailInfoSectionItem]>(value: [])
     private let repository: RepositoryInterface_test
     private let disposeBag = DisposeBag()
     
@@ -31,45 +31,75 @@ final class MypageViewModel: CommonViewModelType {
         let dataSource: Observable<[DetailInfoSectionItem]>
     }
     
-     var dummyData: [DetailInfoSectionItem] = [
+    // MARK: 임시 더미데이터
+    var dummyData: [DetailInfoSectionItem] = [
         .Tag(["Sunny", "Rainy", "Cloudy"]),
         .Thumbnail([
-            UIImage.Sample.sample1 ?? UIImage(), // Use a default image if "sample" is not found
-            UIImage.Sample.sample1 ?? UIImage()  // Same here for the second image
+            UIImage.Sample.sample1 ?? UIImage(),
+            UIImage.Sample.sample1 ?? UIImage()
         ]),
         .Third([30.0, 22.0, 35.0])
     ]
     
     
     func transform(input: Input) -> Output {
-            input.viewDidLoad
-                .flatMapLatest { [weak self] _ -> Observable<[DetailInfoSectionItem]> in
-                    guard let self = self else { return .just([]) }
-
-                    // Check if datasourceRelay already has data
-                    if !self.datasourceRelay.value.isEmpty {
-                        return .just(self.datasourceRelay.value) // Return cached data
-                    }
-
-                    return self.repository.data()
-                        .do(onNext: { data in
-                            print("Received data: \(data)") // 데이터 확인
-                        })
-                        .map { welcome -> [DetailInfoSectionItem] in
-                            print("Parsed welcome data: \(welcome)")  // welcome 데이터 확인
-                            let result = [DetailInfoSectionItem]()
-                            // 데이터 변환 작업을 여기에 추가
-                            return result
-                        }
-                        .catchAndReturn(self.dummyData) // 실패 시 dummyData 반환
-                        .do(onNext: { result in
-                            
-                            self.datasourceRelay.accept(result) // Cache the result
-                        })
+        input.viewDidLoad
+            .flatMapLatest { [weak self] _ -> Observable<[DetailInfoSectionItem]> in
+                guard let self = self else { return .just([]) }
+                
+                if !self.datasourceRelay.value.isEmpty {
+                    return .just(self.datasourceRelay.value)
                 }
-                .bind(to: datasourceRelay)
-                .disposed(by: disposeBag)
-
-            return Output(dataSource: datasourceRelay.asObservable())
+                
+                return self.fetchData()
+                    .catch { _ in
+                            .just(self.dummyData)
+                    }
+                    .do(onNext: { self.datasourceRelay.accept($0) })
+            }
+            .bind(to: datasourceRelay)
+            .disposed(by: disposeBag)
+        
+        return Output(dataSource: datasourceRelay.asObservable())
+    }
+    
+    private func fetchData() -> Observable<[DetailInfoSectionItem]> {
+        return Observable.create { [weak self] observer in
+            guard let self = self else {
+                observer.onCompleted()
+                return Disposables.create()
+            }
+            
+            Task {
+                do {
+                    let welcomeData = try await self.repository.dataAsync()
+                    let transformedData = self.transformData(welcomeData)
+                    observer.onNext(transformedData)
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            
+            return Disposables.create()
         }
     }
+    
+    private func transformData(_ welcome: Welcome) -> [DetailInfoSectionItem] {
+        var items: [DetailInfoSectionItem] = []
+        
+        let tags = welcome.weather.map { $0.description }
+        items.append(.Tag(tags))
+        
+        let thumbnails = [
+            UIImage.Sample.sample1 ?? UIImage(),
+            UIImage.Sample.sample1 ?? UIImage()
+        ]
+        items.append(.Thumbnail(thumbnails))
+        
+        let thirdData = [Double(welcome.main.temp), Double(welcome.main.humidity)]
+        items.append(.Third(thirdData))
+        
+        return items
+    }
+}
