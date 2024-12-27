@@ -43,7 +43,6 @@ final class ThirdView: BaseCollectionViewCell<Any> {
         [imageView].forEach { addSubview($0) }
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-            make.height.equalTo(imageView.snp.width).multipliedBy(0.5) // 2:1 비율
         }
     }
     

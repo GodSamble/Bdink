@@ -116,33 +116,8 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         testWeatherAPI()
         viewModel.datasourceRelay.accept(viewModel.dummyData) // 캐싱하는 방식 채택으로 성능 상승 & 사용자 입장에서, 처음에 데이터불러와지는 이질감 제거.
     }
-      
     
-    private func testWeatherAPI() {
-        let testService = TestService(provider: CustomMoyaProvider<TestAPI>())
-
-        // 예시로 사용할 위도와 경도 값 (원하는 값으로 변경 가능)
-        let latitude: Double = 44.34
-        let longitude: Double = 10.99
-
-        // API 호출
-        testService.getTotalTest(lat: latitude, lon: longitude).subscribe(
-            onNext: { response in
-                // 성공적으로 데이터를 가져왔을 때 처리
-                print("Weather Data: \(response)")
-            },
-            onError: { error in
-                // 오류가 발생했을 때 처리
-                print("Failed to fetch data. Error: \(error)")
-            },
-            onCompleted: {
-                // 요청이 완료되었을 때 처리 (옵션)
-                print("API call completed.")
-            }
-        )
-        .disposed(by: disposeBag) // disposeBag을 사용하여 구독 해제
-    }
-    
+    typealias Task = _Concurrency.Task
     
     func bindViewModel() {
         let input = MypageViewModel.Input(viewDidLoad: rx.viewWillAppear.asObservable().take(1))
@@ -151,6 +126,27 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         output.dataSource
             .bind(to: dataSourceBinder)
             .disposed(by: disposeBag)
+    }
+
+    
+    private func testWeatherAPI() {
+        let testService = TestService(provider: CustomMoyaProvider<TestAPI>())
+
+        let latitude: Double = 44.34
+        let longitude: Double = 10.99
+
+        testService.getTotalTest(lat: latitude, lon: longitude).subscribe(
+            onNext: { response in
+                print("Weather Data: \(response)")
+            },
+            onError: { error in
+                print("Failed to fetch data. Error: \(error)")
+            },
+            onCompleted: {
+                print("API call completed.")
+            }
+        )
+        .disposed(by: disposeBag)
     }
     
     // MARK: - Layout
@@ -170,14 +166,14 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
             collectionView: collectionView,
             cellProvider: { (collectionView, indexPath, item) -> UICollectionViewCell? in
                 switch item {
-                case .Tag(_):
+                case .Tag(let tagText):
                     guard let cell = collectionView.dequeueReusableCell(
                         withReuseIdentifier: TagView.identifier,
                         for: indexPath
                     ) as? TagView else {
                         return nil
                     }
-                    cell.configure()
+                    cell.configure(with: tagText)
                     return cell
                 case .Thumbnail(_):
                     guard let cell = collectionView.dequeueReusableCell(
@@ -195,7 +191,6 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
                     ) as? ThirdView else {
                         return nil
                     }
-//                    cell.configure(with: Third)
                     return cell
                 }
             }
@@ -358,7 +353,7 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
 extension Reactive where Base: UIViewController {
     var viewWillAppear: Observable<Void> {
         return methodInvoked(#selector(Base.viewWillAppear))
-            .map { _ in } // 메서드 호출 시 방출
+            .map { _ in }
     }
 }
 extension Array {

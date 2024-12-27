@@ -34,10 +34,11 @@ enum TabBarItem: CaseIterable {
     
     var rootViewController: UIViewController {
         switch self {
-        case .lecture: return DIContainer.shared.container.resolve(MypageViewController.self)!
-        case .search: return ViewController()
+        case .lecture:       return DIContainer.shared.container.resolve(MypageViewController.self)!
+        case .search:        return ViewController()
         case .premium:       return MovieViewController()
-        case .mypage:        return ViewController()
+        case .mypage:        return MJViewController(viewModel: MJViewModel())
+          
         }
     }
 }
