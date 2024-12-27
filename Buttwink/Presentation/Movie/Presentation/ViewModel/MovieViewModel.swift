@@ -24,7 +24,7 @@ protocol MovieViewModelType {
     var outputs: MovieViewModelOutput { get }
 }
 
-final class MovieViewModel: MovieViewModelType, MovieViewModelInput, MovieViewModelOutput {
+ class MovieViewModel: MovieViewModelType, MovieViewModelInput, MovieViewModelOutput {
     
     var inputs: MovieViewModelInput { return self }
     var outputs: MovieViewModelOutput { return self }
