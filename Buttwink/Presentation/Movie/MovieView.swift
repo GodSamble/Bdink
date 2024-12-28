@@ -86,11 +86,10 @@ final class MovieCell: UICollectionViewCell {
         }
     }
     
-    func configure(with movie: MovieModel) {
+    func configure(with movie: MoviePresentationModel) {
         rankLabel.text = "#\(movie.id)"
-        titleLabel.text = movie.movieName
-        audienceLabel.text = "관객 수: \(movie.audienceCount.formattedWithCommas)명"
-        dateLabel.text = "개봉일: \(movie.openDate)"
-    }
-}
+        titleLabel.text = movie.title
+        audienceLabel.text = "관객 수: \(movie.audienceCount)명" 
+        dateLabel.text = "개봉일: \(movie.releaseDate)"
+    }}
 
