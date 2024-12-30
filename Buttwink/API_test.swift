@@ -20,7 +20,7 @@ extension TestAPI: TargetType {
     var path: String {
         switch self {
         case .getWeatherTest:
-            return "/weather" // Update this path as needed
+            return "/weather"
         }
     }
 
@@ -47,7 +47,7 @@ extension TestAPI: TargetType {
 
     var headers: [String: String]? {
         return [
-            "Content-Type": "application/json" // Set headers as you did with Alamofire
+            "Content-Type": "application/json"
         ]
     }
 }

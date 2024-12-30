@@ -9,25 +9,7 @@ import Foundation
 import RxSwift
 import Moya
 
-
 final class Repository_test: RepositoryInterface_test {
-    func dataAsync() async throws -> Welcome {
-          return try await withCheckedThrowingContinuation { continuation in
-              data()
-                  .subscribe { event in
-                      switch event {
-                      case .next(let data):
-                          continuation.resume(returning: data)
-                      case .error(let error):
-                          continuation.resume(throwing: error)
-                      case .completed:
-                          break
-                      }
-                  }
-                  .disposed(by: DisposeBag())
-          }
-      }
-    
     
     private let service: TestService
     private let lat: Double
@@ -39,16 +21,29 @@ final class Repository_test: RepositoryInterface_test {
         self.lon = lon
     }
     
-    func data() -> Observable<Welcome> {
-        return service.getTotalTest(lat: lat, lon: lon)
-            .flatMap { response in
-                guard let data = response.data else {
-                    return Observable<Welcome>.error(NSError(domain: "RepositoryError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Data is nil"]))
+    func dataAsync() async throws -> Welcome {
+        let response: BaseResponse<Welcome> = try await service.getTotalTest(lat: lat, lon: lon).async()
+        guard let data = response.data else {
+            throw NSError(domain: "RepositoryError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Data is missing"])
+        }
+        return data
+      }
+}
+
+
+//MARK: Concurrency와 RxSwift 혼용시 편의를 위한 익스텐션
+extension Observable {
+    func async() async throws -> Element {
+        try await withCheckedThrowingContinuation { continuation in
+            let disposable = self.subscribe(
+                onNext: { value in
+                    continuation.resume(returning: value)
+                },
+                onError: { error in
+                    continuation.resume(throwing: error)
                 }
-                return Observable.just(data)
-            }
-            .catch { error in
-                return Observable<Welcome>.error(error)
-            }
+            )
+            _ = Disposables.create { disposable.dispose() }
+        }
     }
 }
