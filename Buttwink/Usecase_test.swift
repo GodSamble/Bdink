@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 protocol UseCaseProtocol_test {
-    func data() -> Observable<Welcome>
+    func dataAsync() async throws -> Welcome
 }
 
 final class UseCase_test: UseCaseProtocol_test {
@@ -19,8 +19,8 @@ final class UseCase_test: UseCaseProtocol_test {
         self.repositoryInterface = repositoryInterface
     }
     
-    func data() -> Observable<Welcome> {
-        return self.repositoryInterface.data()
+    func dataAsync() async throws -> Welcome {
+        return try await self.repositoryInterface.dataAsync()
     }
 }
 

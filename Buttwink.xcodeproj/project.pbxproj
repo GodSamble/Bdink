@@ -86,6 +86,16 @@
 		78C002572D1EA01600DA101C /* BoxOfficeTargetType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78C002352D1EA01600DA101C /* BoxOfficeTargetType.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		1D8917162D22C90D00FC5F77 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1D999D392CE0BADA004A4029 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1D999D402CE0BADA004A4029;
+			remoteInfo = Buttwink;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		1D7BB2042CF5D7AC0023AC1C /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -129,6 +139,7 @@
 		1D8067D92D007DB2002456FD /* Service_test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Service_test.swift; path = Buttwink/Service_test.swift; sourceTree = SOURCE_ROOT; };
 		1D8067DB2D007EC7002456FD /* API_test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = API_test.swift; path = Buttwink/API_test.swift; sourceTree = SOURCE_ROOT; };
 		1D8067DF2D008062002456FD /* CustomMoyaProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CustomMoyaProvider.swift; path = Buttwink/Resource/CustomMoyaProvider.swift; sourceTree = SOURCE_ROOT; };
+		1D8917122D22C90C00FC5F77 /* ButtwinkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ButtwinkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D999D412CE0BADA004A4029 /* Buttwink.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Buttwink.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D999D442CE0BADA004A4029 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1D999D462CE0BADA004A4029 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -171,10 +182,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		1D8917132D22C90C00FC5F77 /* ButtwinkTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ButtwinkTests; sourceTree = "<group>"; };
 		710CC7B22D19949F00AC5FA3 /* MJ */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = MJ; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		1D89170F2D22C90C00FC5F77 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1D999D3E2CE0BADA004A4029 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -293,6 +312,7 @@
 			isa = PBXGroup;
 			children = (
 				1D999D432CE0BADA004A4029 /* Buttwink */,
+				1D8917132D22C90C00FC5F77 /* ButtwinkTests */,
 				1D999D422CE0BADA004A4029 /* Products */,
 				1D7BB1FA2CF5D4340023AC1C /* Frameworks */,
 			);
@@ -302,6 +322,7 @@
 			isa = PBXGroup;
 			children = (
 				1D999D412CE0BADA004A4029 /* Buttwink.app */,
+				1D8917122D22C90C00FC5F77 /* ButtwinkTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -595,6 +616,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		1D8917112D22C90C00FC5F77 /* ButtwinkTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1D8917182D22C90D00FC5F77 /* Build configuration list for PBXNativeTarget "ButtwinkTests" */;
+			buildPhases = (
+				1D89170E2D22C90C00FC5F77 /* Sources */,
+				1D89170F2D22C90C00FC5F77 /* Frameworks */,
+				1D8917102D22C90C00FC5F77 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1D8917172D22C90D00FC5F77 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				1D8917132D22C90C00FC5F77 /* ButtwinkTests */,
+			);
+			name = ButtwinkTests;
+			packageProductDependencies = (
+			);
+			productName = ButtwinkTests;
+			productReference = 1D8917122D22C90C00FC5F77 /* ButtwinkTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		1D999D402CE0BADA004A4029 /* Buttwink */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1D999D552CE0BADC004A4029 /* Build configuration list for PBXNativeTarget "Buttwink" */;
@@ -637,9 +681,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1540;
+				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
+					1D8917112D22C90C00FC5F77 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 1D999D402CE0BADA004A4029;
+					};
 					1D999D402CE0BADA004A4029 = {
 						CreatedOnToolsVersion = 15.4;
 					};
@@ -670,11 +718,19 @@
 			projectRoot = "";
 			targets = (
 				1D999D402CE0BADA004A4029 /* Buttwink */,
+				1D8917112D22C90C00FC5F77 /* ButtwinkTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		1D8917102D22C90C00FC5F77 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1D999D3F2CE0BADA004A4029 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -686,6 +742,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1D89170E2D22C90C00FC5F77 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1D999D3D2CE0BADA004A4029 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -759,6 +822,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		1D8917172D22C90D00FC5F77 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1D999D402CE0BADA004A4029 /* Buttwink */;
+			targetProxy = 1D8917162D22C90D00FC5F77 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		1D999D4A2CE0BADA004A4029 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -779,6 +850,44 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		1D8917192D22C90D00FC5F77 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D2Z7W8F79Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = None.ButtwinkTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Buttwink.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Buttwink";
+			};
+			name = Debug;
+		};
+		1D89171A2D22C90D00FC5F77 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D2Z7W8F79Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = None.ButtwinkTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Buttwink.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Buttwink";
+			};
+			name = Release;
+		};
 		1D999D532CE0BADC004A4029 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -957,6 +1066,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1D8917182D22C90D00FC5F77 /* Build configuration list for PBXNativeTarget "ButtwinkTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1D8917192D22C90D00FC5F77 /* Debug */,
+				1D89171A2D22C90D00FC5F77 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		1D999D3C2CE0BADA004A4029 /* Build configuration list for PBXProject "Buttwink" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
