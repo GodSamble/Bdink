@@ -9,10 +9,14 @@ import Foundation
 import Moya
 import RxSwift
 
+protocol TestServiceProtocol {
+    func fetchGetMethod(lat: Double, lon: Double) async throws -> BaseResponse<[Welcome]>
+}
+
 final class TestService {
     private let provider: MoyaProvider<TestAPI>
     
-    init(provider: MoyaProvider<TestAPI>) {
+    init(provider: MoyaProvider<TestAPI> = .init()) {
         self.provider = provider
     }
     

@@ -7,33 +7,48 @@
 
 import UIKit
 import RxSwift
-import DesignSystem
 import RxCocoa
-import RxDataSources
+import DesignSystem
 
-final class MypageViewModel: CommonViewModelType {
+// MARK: - Protocol Definitions
+
+protocol MypageViewModelInput {
+    var viewDidLoad: PublishRelay<Void> { get }
+}
+
+protocol MypageViewModelOutput {
+    var dataSource: BehaviorRelay<[DetailInfoSectionItem]> { get }
+    var error: PublishRelay<Error> { get }
+}
+
+protocol MypageViewModelType {
+    var inputs: MypageViewModelInput { get }
+    var outputs: MypageViewModelOutput { get }
+}
+
+// MARK: - MypageViewModel Implementation
+
+final class MypageViewModel: MypageViewModelType, MypageViewModelInput, MypageViewModelOutput {
     
-    let datasourceRelay = BehaviorRelay<[DetailInfoSectionItem]>(value: [])
-    private let repository: RepositoryInterface_test
+    // MARK: - Inputs & Outputs
+    var inputs: MypageViewModelInput { return self }
+    var outputs: MypageViewModelOutput { return self }
+    
+    // MARK: - Input
+    let viewDidLoad = PublishRelay<Void>()
+    
+    // MARK: - Output
+    let dataSource = BehaviorRelay<[DetailInfoSectionItem]>(value: [])
+    let error = PublishRelay<Error>()
+    
+    // MARK: - Properties
+    private let fetchUseCase: UseCaseProtocol_test
+    private let mapper: MypageMapper
     private let disposeBag = DisposeBag()
     
-    init(repository: RepositoryInterface_test) {
-        self.repository = repository
-    }
-    
-    // MARK: Input
-    struct Input {
-        let viewDidLoad: Observable<Void>
-    }
-    
-    // MARK: Output
-    struct Output {
-        let dataSource: Observable<[DetailInfoSectionItem]>
-    }
-    
-    // MARK: 임시 더미데이터
-    var dummyData: [DetailInfoSectionItem] = [
-        .Tag(["Sunny", "Rainy", "Cloudy"]),
+    // MARK: - Dummy Data
+    let dummyData: [DetailInfoSectionItem] = [
+        .Tag([1, 2, 3]),
         .Thumbnail([
             UIImage.Sample.sample1 ?? UIImage(),
             UIImage.Sample.sample1 ?? UIImage()
@@ -41,65 +56,62 @@ final class MypageViewModel: CommonViewModelType {
         .Third([30.0, 22.0, 35.0])
     ]
     
-    
-    func transform(input: Input) -> Output {
-        input.viewDidLoad
-            .flatMapLatest { [weak self] _ -> Observable<[DetailInfoSectionItem]> in
-                guard let self = self else { return .just([]) }
-                
-                if !self.datasourceRelay.value.isEmpty {
-                    return .just(self.datasourceRelay.value)
-                }
-                
-                return self.fetchData()
-                    .catch { _ in
-                            .just(self.dummyData)
-                    }
-                    .do(onNext: { self.datasourceRelay.accept($0) })
-            }
-            .bind(to: datasourceRelay)
-            .disposed(by: disposeBag)
-        
-        return Output(dataSource: datasourceRelay.asObservable())
+    // MARK: - Initializer
+    init(fetchUseCase: UseCaseProtocol_test, presentationMapper: MypageMapper) {
+        self.fetchUseCase = fetchUseCase
+        self.mapper = presentationMapper
+        setupBindings() // 안전한 호출
     }
     
+    
+    // MARK: - Setup Bindings
+    private func setupBindings() {
+        viewDidLoad
+            .flatMapLatest { [weak self] _ -> Observable<[DetailInfoSectionItem]> in
+                guard let self = self else { return Observable.just([]) }
+                return self.fetchData()
+                    .catch { [weak self] error in
+                        self?.error.accept(error)
+                        return .just(self?.dummyData ?? []) //⭐️
+                    }
+            }
+            .bind(to: dataSource)
+            .disposed(by: disposeBag)
+    }
+    
+    // MARK: - Fetch Data
     private func fetchData() -> Observable<[DetailInfoSectionItem]> {
-        return Observable.create { [weak self] observer in
+        
+        Observable.create { [weak self] observer -> Disposable in
             guard let self = self else {
                 observer.onCompleted()
                 return Disposables.create()
             }
-            
+
             Task {
                 do {
-                    let welcomeData = try await self.repository.dataAsync()
-                    let transformedData = self.transformData(welcomeData)
-                    observer.onNext(transformedData)
+                    let entities = try await self.fetchUseCase.execute(lat: 4.0, lon: 4.0)
+                    let mappedData = self.mapper.transform(entities) // 매핑된 데이터
+                    print("Mapped data: \(mappedData)")
+                    let sectionItems: [DetailInfoSectionItem] = mappedData.flatMap { model in
+                        [
+                            .Tag([model.id]),
+                            .Thumbnail([UIImage.Sample.sample1 ?? UIImage()]),
+                            .Third([Double(model.audienceCount)])
+                        ]
+                    }
+                    observer.onNext(sectionItems) // 변환된 데이터 방출
                     observer.onCompleted()
                 } catch {
-                    observer.onError(error)
+                    print("Error fetching data: \(error)")
+                    // 예외 발생 시 에러를 PublishRelay에 전달하고, dummyData를 사용
+                    self.error.accept(error)
+                    observer.onNext(self.dummyData) // 더미 데이터를 반환
+                    observer.onCompleted()
                 }
             }
-            
+
             return Disposables.create()
         }
-    }
-    
-    private func transformData(_ welcome: Welcome) -> [DetailInfoSectionItem] {
-        var items: [DetailInfoSectionItem] = []
-        
-        let tags = welcome.weather.map { $0.description }
-        items.append(.Tag(tags))
-        
-        let thumbnails = [
-            UIImage.Sample.sample1 ?? UIImage(),
-            UIImage.Sample.sample1 ?? UIImage()
-        ]
-        items.append(.Thumbnail(thumbnails))
-        
-        let thirdData = [Double(welcome.main.temp), Double(welcome.main.humidity)]
-        items.append(.Third(thirdData))
-        
-        return items
     }
 }

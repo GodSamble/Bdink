@@ -1,5 +1,5 @@
 //
-//  ThirdView.swift
+//  ThirdCell.swift
 //  Buttwink
 //
 //  Created by 고영민 on 11/28/24.
@@ -11,11 +11,11 @@ import RxCocoa
 import SnapKit
 import DesignSystem
 
-final class ThirdView: BaseCollectionViewCell<Any> {
+final class ThirdCell: BaseCollectionViewCell<Any> {
     
     // MARK: - Property
     
-    static let identifier: String = "ThirdView"
+    static let identifier: String = "ThirdCell"
     private var bag = DisposeBag()
     
     // MARK: - UI Components

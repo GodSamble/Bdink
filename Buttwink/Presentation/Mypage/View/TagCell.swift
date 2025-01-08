@@ -1,5 +1,5 @@
 //
-//  TagView.swift
+//  TagCell.swift
 //  Buttwink
 //
 //  Created by 고영민 on 11/28/24.
@@ -12,16 +12,11 @@ import RxCocoa
 import SnapKit
 import DesignSystem
 
-struct tagViewModel {
-    let tag : Weather
-}
-
-final class TagView: BaseCollectionViewCell<Any> {
+final class TagCell: BaseCollectionViewCell<Any> {
     
     // MARK: - Property
-    static let identifier = "TagView"
+    static let identifier = "TagCell"
     private var tagButtons: [UIButton] = []
-    var tags: [String] = ["sdf" , "sdf", "asdg"]
     
     // MARK: - Life Cycle
     override init(frame: CGRect) {
@@ -33,15 +28,17 @@ final class TagView: BaseCollectionViewCell<Any> {
     }
     
     // MARK: - Methods
-    func configure(with tags: [String]) {
+    func configure(with tagViewModel: [String]) {
+        // 기존 버튼들을 모두 제거
         tagButtons.forEach { $0.removeFromSuperview() }
         tagButtons.removeAll()
         
         var previousButton: UIButton? = nil
         
-        for tag in tags {
+        // tagViewModel의 tags 배열을 사용하여 버튼 생성
+        for tag in tagViewModel {
             let tagButton = UIButton()
-            tagButton.setTitle(tag, for: .normal)
+            tagButton.setTitle(tag, for: .normal) // 서버에서 받은 name을 버튼 텍스트로 설정
             tagButton.setTitleColor(.white, for: .normal)
             tagButton.backgroundColor = .black
             tagButton.layer.cornerRadius = 8
@@ -51,6 +48,7 @@ final class TagView: BaseCollectionViewCell<Any> {
             contentView.addSubview(tagButton)
             tagButtons.append(tagButton)
             
+            // 레이아웃 설정
             tagButton.snp.makeConstraints { make in
                 make.top.equalToSuperview()
                 make.height.equalTo(30)
@@ -63,5 +61,5 @@ final class TagView: BaseCollectionViewCell<Any> {
             previousButton = tagButton
         }
     }
-
 }
+

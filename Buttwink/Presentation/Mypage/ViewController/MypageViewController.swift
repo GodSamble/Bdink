@@ -13,48 +13,29 @@ import RxDataSources
 import SnapKit
 import Moya
 
-
-struct Tag {
-    let tagName: [String]
-    
-    init(tagName: [String]) {
-        self.tagName = tagName
-    }
-}
-
-struct Thumbnail {
-    let images: [String]
-}
-
-struct Third {
-    let thirdPrice: Int
-}
-
 // MARK: - Section Data
 enum DetailInfoSectionItem: Hashable {
-    case Tag([String])
+    case Tag([Int])
     case Thumbnail([UIImage])
     case Third([Double])
     
     public func getSectionLayoutKind() -> SectionLayoutKind {
         switch self {
-        case .Tag: return .Tag
-        case .Thumbnail: return .Thumbnail
-        case .Third: return .Third
+        case .Tag: return .tags
+        case .Thumbnail: return .thumbnails
+        case .Third: return .thirdSection
         }
     }
 }
 // MARK: - Item
 enum SectionLayoutKind: Int, CaseIterable, Hashable {
-    case Tag
-    case Thumbnail
-    case Third
+    case tags, thumbnails, thirdSection
     
     var numberOfItemsInSection: Int {
         switch self {
-        case .Tag, .Third:
+        case .tags, .thirdSection:
             return 9
-        case .Thumbnail:
+        case .thumbnails:
             return 3
         }
     }
@@ -68,12 +49,12 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         UIImage.Sample.sample1 ?? UIImage(),
         UIImage.Sample.sample1 ?? UIImage()
     ]
-    var thumbanil = ThumbnailView()
+    var thumbanil = ThumbnailCell()
     var viewModel: MypageViewModel!
     var disposeBag = DisposeBag()
     
     private var thumbnailImg: UIImage?
-//    private var thumbnailImgs: [UIImage?] = []
+    //    private var thumbnailImgs: [UIImage?] = []
     var thumbnailImgs = [
         UIImage.Sample.sample1,
         UIImage.Sample.sample1,
@@ -90,15 +71,32 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.showsVerticalScrollIndicator = false
-        collectionView.register(TagView.self, forCellWithReuseIdentifier: TagView.identifier)
-        collectionView.register(ThumbnailView.self, forCellWithReuseIdentifier: ThumbnailView.identifier)
-        collectionView.register(ThirdView.self, forCellWithReuseIdentifier: ThirdView.identifier)
+        collectionView.register(TagCell.self, forCellWithReuseIdentifier: TagCell.identifier)
+        collectionView.register(ThumbnailCell.self, forCellWithReuseIdentifier: ThumbnailCell.identifier)
+        collectionView.register(ThirdCell.self, forCellWithReuseIdentifier: ThirdCell.identifier)
         collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderView.identifier)
         collectionView.isScrollEnabled = true
         return collectionView
     }()
     
-
+    convenience init() {
+        let networkService = TestService()
+        //        let boxOfficeMapper = DefaultMypageDataMapper()
+        let repository = Repository_test(service: networkService
+        )
+        let fetchUseCase = UseCase_test(
+            repositoryInterface: repository
+        )
+        let presentationMapper = DefaultMypagePresentationMapper()
+        
+        let viewModel = MypageViewModel(
+            fetchUseCase: fetchUseCase,
+            presentationMapper: presentationMapper
+        )
+        
+        self.init(viewModel: viewModel)
+    }
+    
     init(viewModel: MypageViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -113,40 +111,29 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         setLayout()
         setupDataSource()
         bindViewModel()
-        testWeatherAPI()
-        viewModel.datasourceRelay.accept(viewModel.dummyData) // 캐싱하는 방식 채택으로 성능 상승 & 사용자 입장에서, 처음에 데이터불러와지는 이질감 제거.
+        viewModel.dataSource.accept(viewModel.dummyData) // 캐싱하는 방식 채택으로 성능 상승 & 사용자 입장에서, 처음에 데이터불러와지는 이질감 제거. // TODO: 스켈레톤 UI
     }
     
     typealias Task = _Concurrency.Task
     
     func bindViewModel() {
-        let input = MypageViewModel.Input(viewDidLoad: rx.viewWillAppear.asObservable().take(1))
-        let output = viewModel.transform(input: input)
-
-        output.dataSource
+        // DataSource 바인딩
+        viewModel.outputs.dataSource
             .bind(to: dataSourceBinder)
             .disposed(by: disposeBag)
-    }
-
-    
-    private func testWeatherAPI() {
-        let testService = TestService(provider: CustomMoyaProvider<TestAPI>())
-
-        let latitude: Double = 44.34
-        let longitude: Double = 10.99
-
-        testService.getTotalTest(lat: latitude, lon: longitude).subscribe(
-            onNext: { response in
-                print("Weather Data: \(response)")
-            },
-            onError: { error in
-                print("Failed to fetch data. Error: \(error)")
-            },
-            onCompleted: {
-                print("API call completed.")
-            }
-        )
-        .disposed(by: disposeBag)
+        
+        // ViewDidLoad 이벤트 처리
+        rx.viewWillAppear
+            .take(1)
+            .bind(to: viewModel.inputs.viewDidLoad)
+            .disposed(by: disposeBag)
+        
+        // 에러 처리 (옵션으로 추가 가능)
+        viewModel.outputs.error
+            .subscribe(onNext: { [weak self] error in
+            })
+            .disposed(by: disposeBag)
+        
     }
     
     // MARK: - Layout
@@ -168,27 +155,27 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
                 switch item {
                 case .Tag(let tagText):
                     guard let cell = collectionView.dequeueReusableCell(
-                        withReuseIdentifier: TagView.identifier,
+                        withReuseIdentifier: TagCell.identifier,
                         for: indexPath
-                    ) as? TagView else {
+                    ) as? TagCell else {
                         return nil
                     }
-                    cell.configure(with: tagText)
+                    cell.configure(with: tagText.map{String($0)})
                     return cell
-                case .Thumbnail(_):
+                case .Thumbnail(let thumbnail):
                     guard let cell = collectionView.dequeueReusableCell(
-                        withReuseIdentifier: ThumbnailView.identifier,
+                        withReuseIdentifier: ThumbnailCell.identifier,
                         for: indexPath
-                    ) as? ThumbnailView else {
+                    ) as? ThumbnailCell else {
                         return nil
                     }
-                    cell.configure([self.thumbnailImgs[indexPath.row]], 3000)
+                    cell.configure(with: thumbnail, with: 3000)
                     return cell
                 case .Third(_):
                     guard let cell = collectionView.dequeueReusableCell(
-                        withReuseIdentifier: ThirdView.identifier,
+                        withReuseIdentifier: ThirdCell.identifier,
                         for: indexPath
-                    ) as? ThirdView else {
+                    ) as? ThirdCell else {
                         return nil
                     }
                     return cell
@@ -196,7 +183,7 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
             }
         )
         
-
+        
         dataSource.supplementaryViewProvider = { (collectionView, kind, indexPath) -> UICollectionReusableView? in
             if kind == UICollectionView.elementKindSectionHeader {
                 guard let headerView = collectionView.dequeueReusableSupplementaryView(
@@ -230,20 +217,20 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
                 return nil
             }
             switch sectionKind {
-            case .Tag:
-                return self?.createTagViewSection(withHeader: false)
-            case .Thumbnail:
-                return self?.createThumbnailViewSection(withHeader: true)
-            case .Third:
+            case .tags:
+                return self?.createTagCellSection(withHeader: false)
+            case .thumbnails:
+                return self?.createThumbnailCellSection(withHeader: true)
+            case .thirdSection:
                 return self?.createThridSection(withHeader: true)
             }
         }
         return layout
     }
     
-
     
-    private func createTagViewSection(withHeader: Bool) -> NSCollectionLayoutSection { //✅
+    
+    private func createTagCellSection(withHeader: Bool) -> NSCollectionLayoutSection { //✅
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(1.0)
@@ -267,7 +254,7 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         return section
     }
     
-    private func createThumbnailViewSection(withHeader: Bool) -> NSCollectionLayoutSection { //✅
+    private func createThumbnailCellSection(withHeader: Bool) -> NSCollectionLayoutSection { //✅
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(1.0)
@@ -275,7 +262,7 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .absolute(271),
+            widthDimension: .estimated(650),
             heightDimension: .estimated(356)
         )
         let group = NSCollectionLayoutGroup.horizontal(

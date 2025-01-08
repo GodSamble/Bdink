@@ -23,6 +23,7 @@ struct Welcome: Codable, Equatable {
     let cod: Int
 }
 
+
 // MARK: - Clouds
 struct Clouds: Codable, Equatable {
     let all: Int

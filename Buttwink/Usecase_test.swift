@@ -1,3 +1,4 @@
+
 //
 //  Usecase_test.swift
 //  Buttwink
@@ -9,7 +10,7 @@ import Foundation
 import RxSwift
 
 protocol UseCaseProtocol_test {
-    func dataAsync() async throws -> Welcome
+    func execute(lat: Double, lon: Double) async throws -> [Welcome]
 }
 
 final class UseCase_test: UseCaseProtocol_test {
@@ -19,8 +20,8 @@ final class UseCase_test: UseCaseProtocol_test {
         self.repositoryInterface = repositoryInterface
     }
     
-    func dataAsync() async throws -> Welcome {
-        return try await self.repositoryInterface.dataAsync()
+    func execute(lat: Double, lon: Double) async throws -> [Welcome] {
+        return try await repositoryInterface.fetchGetMethod(lat: 4.0, lon: 4.0)
     }
 }
 

@@ -13,24 +13,43 @@ final class DIContainer {
     let container = Container()
 
     private init() {
+        // TestService 등록
         container.register(TestService.self) { _ in
             let provider = CustomMoyaProvider<TestAPI>()
             return TestService(provider: provider)
         }
 
-        container.register(Repository_test.self) { resolver in
+        // Repository_test 등록
+        container.register(RepositoryInterface_test.self) { resolver in
             let service = resolver.resolve(TestService.self)!
-            return Repository_test(service: service, lat: 3.0, lon: 3.0)
+            return Repository_test(service: service)
         }
 
+        // UseCase_test 등록
+        container.register(UseCaseProtocol_test.self) { resolver in
+            let repository = resolver.resolve(RepositoryInterface_test.self)!
+            return UseCase_test(repositoryInterface: repository)
+        }
+
+        // MypageMapper 등록
+        container.register(MypageMapper.self) { _ in
+            DefaultMypagePresentationMapper()
+        }
+
+        // MypageViewModel 등록
         container.register(MypageViewModel.self) { resolver in
-            let repository = resolver.resolve(Repository_test.self)!
-            return MypageViewModel(repository: repository)
+            let useCase = resolver.resolve(UseCaseProtocol_test.self)!
+            guard let mapper = resolver.resolve(MypageMapper.self) else {
+                fatalError("Failed to resolve MypageMapper")
+            }
+            return MypageViewModel(fetchUseCase: useCase, presentationMapper: mapper)
         }
 
+        // MypageViewController 등록
         container.register(MypageViewController.self) { resolver in
             let viewModel = resolver.resolve(MypageViewModel.self)!
             return MypageViewController(viewModel: viewModel)
         }
     }
 }
+

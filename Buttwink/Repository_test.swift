@@ -12,23 +12,22 @@ import Moya
 final class Repository_test: RepositoryInterface_test {
     
     private let service: TestService
-    private let lat: Double
-    private let lon: Double
     
-    init(service: TestService, lat: Double, lon: Double) {
+    init(service: TestService) {
         self.service = service
-        self.lat = lat
-        self.lon = lon
     }
     
-    func dataAsync() async throws -> Welcome {
-        let response: BaseResponse<Welcome> = try await service.getTotalTest(lat: lat, lon: lon).async()
-        guard let data = response.data else {
+    func fetchGetMethod(lat: Double, lon: Double) async throws -> [Welcome] {
+        let dto = try await service.getTotalTest(lat: lat, lon: lon).async()
+        guard let data = dto.data else {
             throw NSError(domain: "RepositoryError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Data is missing"])
         }
-        return data
-      }
+        return [data]
+    }
 }
+
+
+
 
 
 //MARK: Concurrency와 RxSwift 혼용시 편의를 위한 익스텐션

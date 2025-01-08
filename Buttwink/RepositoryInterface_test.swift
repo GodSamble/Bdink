@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 protocol RepositoryInterface_test {
-    func dataAsync() async throws -> Welcome
+    func fetchGetMethod(lat: Double, lon: Double) async throws -> [Welcome]
 }
 
 
@@ -17,11 +17,11 @@ protocol RepositoryInterface_test {
 final class MockRepository: RepositoryInterface_test {
     var shouldReturnError = false
 
-    func dataAsync() async throws -> Welcome {
+    func fetchGetMethod(lat: Double, lon: Double) async throws -> [Welcome] {
         if shouldReturnError {
             throw NSError(domain: "MockError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Mock error occurred"])
         }
-        return Welcome(
+        return [Welcome(
             coord: Coord(lon: 135.0, lat: 34.7),
             weather: [
                 Weather(id: 800, main: "Clear", description: "clear sky", icon: "01d")
@@ -54,5 +54,6 @@ final class MockRepository: RepositoryInterface_test {
             name: "Osaka",
             cod: 200
         )
+    ]
     }
 }
