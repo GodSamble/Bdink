@@ -20,12 +20,16 @@ final class ThumbnailCell: BaseCollectionViewCell<Any> {
     private var thumbnail: [UIImageView] = []
     var previousThumbnail: UIImageView? = nil
     
+    var currentPage = 1
+    var isLoading = false
+    let itemsPerPage = 15
+    
     
     // MARK: - UI Components
     
     private let imageView: UIImageView = {
         let view = UIImageView()
-        view.backgroundColor = .blue
+        view.backgroundColor = .white
         view.layer.cornerRadius = 8
         view.image = .Sample.sample1
         view.contentMode = .scaleAspectFill
@@ -40,11 +44,25 @@ final class ThumbnailCell: BaseCollectionViewCell<Any> {
         return label
     }()
     
+    private var bookmarkButton: UIButton = {
+        let button = UIButton()
+        button.imageView?.contentMode = .scaleAspectFit
+        return button
+    }()
+    
     // MARK: - Life Cycle
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .yellow
         setLayout()
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        imageView.image = nil
+        previousThumbnail = nil
+        thumbnail.removeAll()
+        bag = DisposeBag() // RxSwift DisposeBag 재설정
     }
     
     required init?(coder: NSCoder) {
@@ -56,51 +74,38 @@ final class ThumbnailCell: BaseCollectionViewCell<Any> {
     
     private func setLayout() {
         self.addSubview(imageView)
-        imageView.addSubview(titleLabel)
+        imageView.addSubviews(titleLabel, bookmarkButton)
         imageView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-            make.height.equalTo(contentView.snp.height)
+            make.leading.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(366)
+            make.width.equalTo(270)
         }
         titleLabel.snp.makeConstraints { make in
             make.bottom.equalToSuperview().inset(13)
             make.leading.equalToSuperview().inset(13)
         }
+
     }
     
-    public func configure(with images: [UIImage], with count: Int) {
-        // 기존 thumbnail 뷰 제거
-        thumbnail.forEach {
-            $0.image = nil
-            $0.removeFromSuperview()
-        }
-        thumbnail.removeAll()
+    @objc
+    func BookmarkTapped() {
         
-        var previousThumbnail: UIImageView? = nil
-        
-        // 이미지 배열 처리
-        for image in images {
-            let uiimage = UIImageView()
-            uiimage.backgroundColor = .blue
-            uiimage.layer.cornerRadius = 8
-            uiimage.image = image ?? .Sample.sample1  // 이미지가 nil인 경우 기본 이미지 설정
-            uiimage.contentMode = .scaleAspectFill
-            uiimage.clipsToBounds = true
-            contentView.addSubview(uiimage)
-            thumbnail.append(uiimage)
-            
-            // 레이아웃 제약 설정
-            uiimage.snp.makeConstraints { make in
-                make.top.equalToSuperview()
-                make.height.equalTo(contentView.snp.height)
-                make.width.equalTo(271)  // 이미지의 너비를 명확히 설정 (필요에 따라 조정)
-                if let previous = previousThumbnail {
-                    make.left.equalTo(previous.snp.right).offset(8)
-                } else {
-                    make.left.equalToSuperview().offset(8)
-                }
-                previousThumbnail = uiimage
-            }
-        }
     }
+    
+    
+    public func configure(with images: [UIImage], with count: Int) {
+        guard !images.isEmpty, count > 0 else {
+            print("No images to configure.")
+            return
+        }
+        
+        // index 계산 시 count와 배열의 크기를 고려
+        let imageIndex = min(count - 1, images.count - 1)
+        let selectedImage = images[imageIndex]
+        
+        // 이미지 뷰에 이미지 설정
+        self.imageView.image = selectedImage
+    }
+    
 }
-

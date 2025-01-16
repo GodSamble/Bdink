@@ -1,5 +1,5 @@
 //
-//  MypageViewController.swift
+//  ShortsFeedViewController.swift
 //  Buttwink
 //
 //  Created by 고영민 on 11/26/24.
@@ -15,9 +15,9 @@ import Moya
 
 // MARK: - Section Data
 enum DetailInfoSectionItem: Hashable {
-    case Tag([Int])
+    case Tag([String])
     case Thumbnail([UIImage])
-    case Third([Double])
+    case Third([UIImage])
     
     public func getSectionLayoutKind() -> SectionLayoutKind {
         switch self {
@@ -30,36 +30,31 @@ enum DetailInfoSectionItem: Hashable {
 // MARK: - Item
 enum SectionLayoutKind: Int, CaseIterable, Hashable {
     case tags, thumbnails, thirdSection
-    
-    var numberOfItemsInSection: Int {
-        switch self {
-        case .tags, .thirdSection:
-            return 9
-        case .thumbnails:
-            return 3
-        }
-    }
 }
 
 // MARK: - View Controller
 
-final class MypageViewController: UIViewController, UICollectionViewDelegate, ViewModelBindableType {
+final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate, ViewModelBindableType, HeaderViewDelegate {
     
-    var thumbnails: [UIImage?] = [
-        UIImage.Sample.sample1 ?? UIImage(),
-        UIImage.Sample.sample1 ?? UIImage()
+    let categoryViewModel = CategoryVideosViewModel()
+    
+    let sampleImages: [UIImage] = [
+        UIImage.Icon.alarm_default!,
+        UIImage.Icon.feed!,
+        UIImage.Sample.sample1!
     ]
-    var thumbanil = ThumbnailCell()
-    var viewModel: MypageViewModel!
+    let tagNames: [String] = ["NPC", "WNGP", "NABBA"]
+    let thirdImages: [UIImage] = [
+        UIImage.Icon.alarm_default!,
+        UIImage.Icon.feed!,
+        UIImage.Sample.sample1!
+    ]
+
+    
+    var selectedTag: String? = nil
+    var viewModel: ShortsFeedViewModel!
     var disposeBag = DisposeBag()
     
-    private var thumbnailImg: UIImage?
-    //    private var thumbnailImgs: [UIImage?] = []
-    var thumbnailImgs = [
-        UIImage.Sample.sample1,
-        UIImage.Sample.sample1,
-        UIImage.Sample.sample1
-    ]
     
     // DiffableDataSource 관련 속성 초기화
     private var currentSnapshot = NSDiffableDataSourceSnapshot<SectionLayoutKind, DetailInfoSectionItem>()
@@ -89,7 +84,7 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         )
         let presentationMapper = DefaultMypagePresentationMapper()
         
-        let viewModel = MypageViewModel(
+        let viewModel = ShortsFeedViewModel(
             fetchUseCase: fetchUseCase,
             presentationMapper: presentationMapper
         )
@@ -97,7 +92,7 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         self.init(viewModel: viewModel)
     }
     
-    init(viewModel: MypageViewModel) {
+    init(viewModel: ShortsFeedViewModel!) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -112,6 +107,8 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         setupDataSource()
         bindViewModel()
         viewModel.dataSource.accept(viewModel.dummyData) // 캐싱하는 방식 채택으로 성능 상승 & 사용자 입장에서, 처음에 데이터불러와지는 이질감 제거. // TODO: 스켈레톤 UI
+        viewModel.inputs.viewDidLoad.accept(())
+        updateSnapshot()
     }
     
     typealias Task = _Concurrency.Task
@@ -119,6 +116,7 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
     func bindViewModel() {
         // DataSource 바인딩
         viewModel.outputs.dataSource
+            .observe(on: MainScheduler.instance)
             .bind(to: dataSourceBinder)
             .disposed(by: disposeBag)
         
@@ -153,23 +151,43 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
             collectionView: collectionView,
             cellProvider: { (collectionView, indexPath, item) -> UICollectionViewCell? in
                 switch item {
-                case .Tag(let tagText):
+                case .Tag( _):
                     guard let cell = collectionView.dequeueReusableCell(
                         withReuseIdentifier: TagCell.identifier,
                         for: indexPath
                     ) as? TagCell else {
                         return nil
                     }
-                    cell.configure(with: tagText.map{String($0)})
+                    let dynamicCount = indexPath.row % self.sampleImages.count + 1
+                    cell.configure(with: self.tagNames, with: dynamicCount)
+
+                    cell.buttonTapSubject
+                        .observe(on: MainScheduler.instance)
+                        .subscribe(onNext: { [weak self] buttonType in
+                            guard let self = self else { return }
+                            
+                            switch buttonType {
+                            case .NPC:
+                                self.viewModel.handleButtonTap(for: .NPC)
+                            case .WNGP:
+                                self.viewModel.handleButtonTap(for: .WNGP)
+                            case .NABBA:
+                                self.viewModel.handleButtonTap(for: .NABBA)
+                            }
+                        })
+                        .disposed(by: cell.disposeBag)
                     return cell
-                case .Thumbnail(let thumbnail):
+                case .Thumbnail( _):
                     guard let cell = collectionView.dequeueReusableCell(
                         withReuseIdentifier: ThumbnailCell.identifier,
                         for: indexPath
                     ) as? ThumbnailCell else {
                         return nil
                     }
-                    cell.configure(with: thumbnail, with: 3000)
+                    // indexPath.row를 기반으로 count 전달
+                    let dynamicCount = indexPath.row % self.sampleImages.count + 1
+                    cell.configure(with: self.sampleImages, with: dynamicCount)
+                    self.viewModel.updateThumbnail(for: indexPath)
                     return cell
                 case .Third(_):
                     guard let cell = collectionView.dequeueReusableCell(
@@ -178,6 +196,8 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
                     ) as? ThirdCell else {
                         return nil
                     }
+                    let dynamicCount = indexPath.row % self.sampleImages.count + 1
+                    cell.configure(with: self.thirdImages, with: dynamicCount)
                     return cell
                 }
             }
@@ -193,34 +213,31 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
                 ) as? HeaderView else {
                     return nil
                 }
+                headerView.delegate = self
                 return headerView
             }
             return nil
         }
     }
     
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return SectionLayoutKind.allCases.count
-    }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let section = SectionLayoutKind(rawValue: section) else {
+        guard let sectionKind = SectionLayoutKind(rawValue: section) else {
             return 0
         }
-        return section.numberOfItemsInSection
+        
+        return currentSnapshot.itemIdentifiers(inSection: sectionKind).count
     }
-    
     
     private func createLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewCompositionalLayout { [weak self] (sectionIndex: Int, layoutEnvironment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection? in
-            guard let sectionKind = SectionLayoutKind.allCases[safe: sectionIndex] else {
-                return nil
-            }
+            guard let sectionKind = SectionLayoutKind.allCases[safe: sectionIndex] else {return nil}
+            
             switch sectionKind {
             case .tags:
                 return self?.createTagCellSection(withHeader: false)
             case .thumbnails:
-                return self?.createThumbnailCellSection(withHeader: true)
+                return self?.createThumbnailCellSection(withHeader: false)
             case .thirdSection:
                 return self?.createThridSection(withHeader: true)
             }
@@ -232,37 +249,40 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
     
     private func createTagCellSection(withHeader: Bool) -> NSCollectionLayoutSection { //✅
         let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .fractionalHeight(1.0)
+            widthDimension: .estimated(80),
+            heightDimension: .estimated(33)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
+
         
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .estimated(420),
-            heightDimension: .estimated(30)
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(33)
         )
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
             subitems: [item]
         )
+        group.interItemSpacing = .fixed(0)
         
         let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 4
-        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 22, bottom: 0, trailing: 22)
-        section.orthogonalScrollingBehavior = .continuous
+        section.interGroupSpacing = 0
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 22, bottom: 7, trailing: 0)
+        section.boundarySupplementaryItems = []
+        section.orthogonalScrollingBehavior = .none
         
         return section
     }
     
     private func createThumbnailCellSection(withHeader: Bool) -> NSCollectionLayoutSection { //✅
         let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
+            widthDimension: .estimated(270),
             heightDimension: .fractionalHeight(1.0)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        
+
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .estimated(650),
+            widthDimension: .estimated(2000),
             heightDimension: .estimated(356)
         )
         let group = NSCollectionLayoutGroup.horizontal(
@@ -272,7 +292,7 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         
         let section = NSCollectionLayoutSection(group: group)
         section.interGroupSpacing = 8
-        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 22, bottom: 0, trailing: 22)
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 22, bottom: 30, trailing: 22)
         section.orthogonalScrollingBehavior = .continuous
         
         if withHeader {
@@ -310,7 +330,7 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         
         if withHeader {
             let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                    heightDimension: .estimated(50))
+                                                    heightDimension: .estimated(40))
             let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
                                                                      elementKind: UICollectionView.elementKindSectionHeader,
                                                                      alignment: .top)
@@ -320,19 +340,61 @@ final class MypageViewController: UIViewController, UICollectionViewDelegate, Vi
         return section
     }
     
+    private func updateSnapshot() {
+        currentSnapshot.deleteAllItems()
+        currentSnapshot.appendSections(SectionLayoutKind.allCases)
+        currentSnapshot.appendItems(viewModel.outputs.dataSource.value, toSection: .thumbnails)
+        dataSource.apply(currentSnapshot, animatingDifferences: true)
+    }
+    
     var dataSourceBinder: Binder<[DetailInfoSectionItem]> {
         return Binder(self) { view, data in
+            // Snapshot 초기화
             view.currentSnapshot = NSDiffableDataSourceSnapshot<SectionLayoutKind, DetailInfoSectionItem>()
             
+            // 모든 섹션 추가
             SectionLayoutKind.allCases.forEach { section in
                 view.currentSnapshot.appendSections([section])
             }
             
+            // 데이터 처리
             for item in data {
                 let section = item.getSectionLayoutKind()
-                view.currentSnapshot.appendItems([item], toSection: section)
+                var items: [DetailInfoSectionItem] = []
+                
+                // Section별 아이템 생성
+                switch item {
+                case .Tag(let tags):
+                    items = tags.map { DetailInfoSectionItem.Tag([$0]) }
+                case .Thumbnail(let images):
+                    items = images.map { DetailInfoSectionItem.Thumbnail([$0]) }
+                case .Third(let strings):
+                    items = strings.map { DetailInfoSectionItem.Third([$0]) }
+                }
+                
+                // 아이템을 섹션에 추가
+                view.currentSnapshot.appendItems(items, toSection: section)
             }
+            
+            // Snapshot 적용
             view.dataSource.apply(view.currentSnapshot, animatingDifferences: true)
+        }
+    }
+    
+    // MARK: 화면전환(w.델리게이트)
+    
+    func didTapHeaderButton() {
+        let categoryVC = CategoryVideosViewController(viewModel: categoryViewModel)
+        navigationController?.pushViewController(categoryVC, animated: true)
+    }
+    
+    func getButtonType(from buttonName: String) -> ButtonType {
+        if buttonName.contains("WNGP") {
+            return .WNGP
+        } else if buttonName.contains("NPC") {
+            return .NPC
+        } else {
+            return .NABBA
         }
     }
 }

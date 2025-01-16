@@ -7,6 +7,18 @@
 
 import Foundation
 
+
+struct Video: Codable, Equatable {
+    let index: Int
+    let thumbnailURL: String
+    let title: String
+}
+
+let dummyVideos: [Video] = (1...100).map {
+    Video(index: $0, thumbnailURL: "https://placekitten.com/200/200?image=\($0)", title: "Video \($0)")
+}
+
+
 struct Welcome: Codable, Equatable {
     let coord: Coord
     let weather: [Weather]

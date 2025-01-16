@@ -23,6 +23,7 @@ final class ThirdCell: BaseCollectionViewCell<Any> {
     private let imageView: UIImageView = {
         let view = UIImageView()
         view.image = .Sample.sample1
+        view.backgroundColor = .white
         view.sizeToFit()
         return view
     }()
@@ -33,6 +34,11 @@ final class ThirdCell: BaseCollectionViewCell<Any> {
         setLayout()
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        imageView.image = nil
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -40,20 +46,26 @@ final class ThirdCell: BaseCollectionViewCell<Any> {
     // MARK: - Methods
     
     private func setLayout() {
-        [imageView].forEach { addSubview($0) }
+        self.addSubview(imageView)
         imageView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.leading.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(169)
+            make.width.equalTo(169)
         }
     }
     
-    public func configure(_ images: [UIImage?], _ count: Int) {
-        if let img = images.first ?? nil {
-            imageView.image = img
-//            titleLabel.text = "들어간다 \(count)"
-            imageView.backgroundColor = .clear
-        } else {
-            imageView.image = UIImage(systemName: "sample")?.resizeWithWidth(width: 200)?.withTintColor(.buttwink_gray200)
-//            titleLabel.text = "000"
+    public func configure(with images: [UIImage], with count: Int) {
+        guard !images.isEmpty, count > 0 else {
+            print("No images to configure.")
+            return
         }
+        
+        // index 계산 시 count와 배열의 크기를 고려
+        let imageIndex = min(count - 1, images.count - 1)
+        let selectedImage = images[imageIndex]
+        
+        // 이미지 뷰에 이미지 설정
+        self.imageView.image = selectedImage
     }
 }

@@ -8,12 +8,16 @@
 import UIKit
 import DesignSystem
 
+protocol HeaderViewDelegate: AnyObject {
+    func didTapHeaderButton()
+}
+
 final class HeaderView: UICollectionReusableView {
     
     // MARK: - Property
     
     static let identifier = "HeaderView"
-    var closeButtonTappedClosure: (() -> Void)?
+    weak var delegate: HeaderViewDelegate?
     
     // MARK: - UI Components
     
@@ -27,18 +31,27 @@ final class HeaderView: UICollectionReusableView {
         let button = UIButton()
         button.setTitle("더 보기", for: .normal)
         button.setTitleColor(.buttwink_gray400, for: .normal)
-        button.addTarget(HeaderView.self, action: #selector(didTapMoreButton), for: .touchUpInside)
         return button
     }()
     
-    @objc private func didTapMoreButton() {
-        self.closeButtonTappedClosure?()
+
+     @objc private func didTapMoreButton() {
+         delegate?.didTapHeaderButton() // Delegate 호출
+     }
+    
+    func didTapHeaderButton() {
+        print("Header button tapped")
+    }
+    
+    func setupActions() {
+        moreButton.addTarget(self, action: #selector(didTapMoreButton), for: .touchUpInside)
     }
     
     // MARK: - Life Cycle
     override init(frame: CGRect) {
         super.init(frame: frame)
         setLayout()
+        setupActions()
     }
     
     required init?(coder: NSCoder) {

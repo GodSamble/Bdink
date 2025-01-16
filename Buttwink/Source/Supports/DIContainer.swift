@@ -36,19 +36,19 @@ final class DIContainer {
             DefaultMypagePresentationMapper()
         }
 
-        // MypageViewModel 등록
-        container.register(MypageViewModel.self) { resolver in
+        // ShortsFeedViewModel 등록
+        container.register(ShortsFeedViewModel.self) { resolver in
             let useCase = resolver.resolve(UseCaseProtocol_test.self)!
             guard let mapper = resolver.resolve(MypageMapper.self) else {
                 fatalError("Failed to resolve MypageMapper")
             }
-            return MypageViewModel(fetchUseCase: useCase, presentationMapper: mapper)
+            return ShortsFeedViewModel(fetchUseCase: useCase, presentationMapper: mapper)
         }
 
-        // MypageViewController 등록
-        container.register(MypageViewController.self) { resolver in
-            let viewModel = resolver.resolve(MypageViewModel.self)!
-            return MypageViewController(viewModel: viewModel)
+        // ShortsFeedViewController 등록
+        container.register(ShortsFeedViewController.self) { resolver in
+            let viewModel = resolver.resolve(ShortsFeedViewModel.self)!
+            return ShortsFeedViewController(viewModel: viewModel)
         }
     }
 }
