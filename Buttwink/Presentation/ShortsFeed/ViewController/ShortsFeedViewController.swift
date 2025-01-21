@@ -12,6 +12,8 @@ import RxCocoa
 import RxDataSources
 import SnapKit
 import Moya
+import YouTubePlayerKit
+import SwiftUI
 
 // MARK: - Section Data
 enum DetailInfoSectionItem: Hashable {
@@ -37,6 +39,12 @@ enum SectionLayoutKind: Int, CaseIterable, Hashable {
 final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate, ViewModelBindableType, HeaderViewDelegate {
     
     let categoryViewModel = CategoryVideosViewModel()
+    
+    let videoURLs: [String] = [
+      "https://www.youtube.com/shorts/q3ZOdrWTbl8",
+      "https://www.youtube.com/shorts/sj_BoRg7pS8",
+      "https://www.youtube.com/shorts/Rp5GI1wdHMs"
+    ]
     
     let sampleImages: [UIImage] = [
         UIImage.Icon.alarm_default!,
@@ -383,10 +391,24 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
     
     // MARK: 화면전환(w.델리게이트)
     
+//    func didTapHeaderButton() {
+//        let categoryVC = CategoryVideosViewController(viewModel: categoryViewModel)
+//        navigationController?.pushViewController(categoryVC, animated: true)
+//    }
+    
     func didTapHeaderButton() {
-        let categoryVC = CategoryVideosViewController(viewModel: categoryViewModel)
-        navigationController?.pushViewController(categoryVC, animated: true)
+        // ContentView 생성
+        let contentView = ContentView()
+        
+        // PagingScrollView 초기화
+        let pagingScrollView = UIHostingController(rootView: contentView)
+        
+        // 네비게이션 컨트롤러로 푸시
+        navigationController?.pushViewController(pagingScrollView, animated: true)
     }
+    
+    
+
     
     func getButtonType(from buttonName: String) -> ButtonType {
         if buttonName.contains("WNGP") {
