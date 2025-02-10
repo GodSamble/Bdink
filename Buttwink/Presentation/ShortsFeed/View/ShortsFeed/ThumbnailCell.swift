@@ -10,6 +10,7 @@ import RxSwift
 import RxCocoa
 import SnapKit
 import DesignSystem
+import Kingfisher
 
 final class ThumbnailCell: BaseCollectionViewCell<Any> {
     
@@ -23,6 +24,9 @@ final class ThumbnailCell: BaseCollectionViewCell<Any> {
     var currentPage = 1
     var isLoading = false
     let itemsPerPage = 15
+    
+    var items: [String] = []
+    private var thumbnailImageViews: [UIImageView] = []
     
     
     // MARK: - UI Components
@@ -60,10 +64,12 @@ final class ThumbnailCell: BaseCollectionViewCell<Any> {
     override func prepareForReuse() {
         super.prepareForReuse()
         imageView.image = nil
+        imageView.kf.cancelDownloadTask() // 기존 이미지 다운로드 취소
         previousThumbnail = nil
         thumbnail.removeAll()
         bag = DisposeBag() // RxSwift DisposeBag 재설정
     }
+    
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -85,7 +91,7 @@ final class ThumbnailCell: BaseCollectionViewCell<Any> {
             make.bottom.equalToSuperview().inset(13)
             make.leading.equalToSuperview().inset(13)
         }
-
+        
     }
     
     @objc
@@ -93,19 +99,57 @@ final class ThumbnailCell: BaseCollectionViewCell<Any> {
         
     }
     
-    
-    public func configure(with images: [UIImage], with count: Int) {
-        guard !images.isEmpty, count > 0 else {
-            print("No images to configure.")
-            return
+    func configure(_ videoItems: [VideoItem]) {
+        // 기존 썸네일 이미지뷰 초기화
+        thumbnailImageViews.forEach { $0.removeFromSuperview() }
+        thumbnailImageViews.removeAll()
+
+        // URL 배열 생성 (최대 10개까지만 가져오기)
+        let urls = videoItems.prefix(10).compactMap { $0.snippet.thumbnails.default.url }
+        
+        var previousView: UIImageView? = nil
+
+        for urlString in urls {
+            guard let url = URL(string: urlString) else {
+                       print("⚠️ 잘못된 URL: \(urlString)")
+                       continue
+                   }
+            
+            let imageView = UIImageView()
+                   imageView.kf.setImage(
+                       with: url,
+                       placeholder: UIImage(named: "placeholder"),
+                       options: [
+                           .transition(.fade(0.3)),
+                           .cacheOriginalImage
+                       ]
+                   ) { result in
+                       switch result {
+                       case .success(let value):
+                           print("✅ 이미지 로드 성공: \(value.source.url?.absoluteString ?? "알 수 없음")")
+                       case .failure(let error):
+                           print("❌ 이미지 로드 실패: \(error.localizedDescription)")
+                       }
+                   }
+            imageView.contentMode = .scaleAspectFill
+            imageView.clipsToBounds = true
+            imageView.layer.cornerRadius = 8
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+
+            self.addSubview(imageView)
+            thumbnailImageViews.append(imageView)
+
+            // 오토레이아웃 설정
+            imageView.snp.makeConstraints { make in
+                make.width.equalToSuperview()
+                make.height.equalToSuperview()
+                make.edges.equalToSuperview()
+            }
+
+            previousView = imageView
         }
-        
-        // index 계산 시 count와 배열의 크기를 고려
-        let imageIndex = min(count - 1, images.count - 1)
-        let selectedImage = images[imageIndex]
-        
-        // 이미지 뷰에 이미지 설정
-        self.imageView.image = selectedImage
+
+        // 아이템 URL 저장
+        items = urls
     }
-    
 }

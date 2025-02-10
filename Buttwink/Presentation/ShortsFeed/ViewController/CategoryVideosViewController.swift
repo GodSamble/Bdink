@@ -81,7 +81,7 @@ final class CategoryVideosViewController: UIViewController, UICollectionViewDele
         // dataSource가 바인딩된 이후에 데이터 확인
         viewModel.outputs.dataSource
             .subscribe(onNext: { data in
-//                print("Data received in dataSource: \(data)")
+                //                print("Data received in dataSource: \(data)")
             })
             .disposed(by: disposeBag)
         
@@ -162,35 +162,35 @@ final class CategoryVideosViewController: UIViewController, UICollectionViewDele
     
     private func createCategoryVideoCellSection() -> NSCollectionLayoutSection {
         // 1. 아이템 크기 설정
-         let itemSize = NSCollectionLayoutSize(
-             widthDimension: .fractionalWidth(0.5), // 각 아이템의 너비를 그룹의 절반으로 설정
-             heightDimension: .absolute(220)        // 고정 높이 설정
-         )
-         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-         item.contentInsets = NSDirectionalEdgeInsets(//✅
-             top: 0, leading: 17, bottom: 0, trailing: 17 // 아이템 간 간격 설정
-         )
-
-         // 2. 그룹 크기 설정 (2개의 아이템 포함)
-         let groupSize = NSCollectionLayoutSize(
-             widthDimension: .fractionalWidth(1.0), // 그룹 너비 = 섹션 너비
-             heightDimension: .absolute(220)        // 고정 높이 설정
-         )
-         let group = NSCollectionLayoutGroup.horizontal(//✅
-             layoutSize: groupSize,
-             subitem: item,  // 동일한 아이템 사용
-             count: 2        // 한 그룹에 2개의 아이템 배치
-         )
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(0.5), // 각 아이템의 너비를 그룹의 절반으로 설정
+            heightDimension: .absolute(220)        // 고정 높이 설정
+        )
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = NSDirectionalEdgeInsets(//✅
+            top: 0, leading: 17, bottom: 0, trailing: 17 // 아이템 간 간격 설정
+        )
+        
+        // 2. 그룹 크기 설정 (2개의 아이템 포함)
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0), // 그룹 너비 = 섹션 너비
+            heightDimension: .absolute(220)        // 고정 높이 설정
+        )
+        let group = NSCollectionLayoutGroup.horizontal(//✅
+            layoutSize: groupSize,
+            subitem: item,  // 동일한 아이템 사용
+            count: 2        // 한 그룹에 2개의 아이템 배치
+        )
         group.interItemSpacing = .fixed(-17) // 아이템 간 간격 10 설정
-
-         // 3. 섹션 설정
-         let section = NSCollectionLayoutSection(group: group)
-         section.contentInsets = NSDirectionalEdgeInsets(
-             top: 0, leading: 0, bottom: 0, trailing: 0 // 섹션의 여백 설정
-         )
-         section.interGroupSpacing = 38 // 그룹 간 간격 설정
-
-         return section
+        
+        // 3. 섹션 설정
+        let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets = NSDirectionalEdgeInsets(
+            top: 0, leading: 0, bottom: 0, trailing: 0 // 섹션의 여백 설정
+        )
+        section.interGroupSpacing = 38 // 그룹 간 간격 설정
+        
+        return section
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

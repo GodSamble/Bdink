@@ -9,13 +9,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 import DesignSystem
-
-// MARK: - 상태 관리 구조체 ( 비동기 관련 )
-//struct MypageState {
-//    var isLoading: BehaviorRelay<Bool>
-//    var currentPage: BehaviorRelay<Int>
-//    var videos: BehaviorRelay<[Video]>
-//}
+import RxDataSources
 
 // MARK: - Protocol Definitions
 
@@ -24,8 +18,9 @@ protocol ShortsFeedViewModelInput {
 }
 
 protocol ShortsFeedViewModelOutput {
-    var dataSource: BehaviorRelay<[DetailInfoSectionItem]> { get }
+    var snapshotRelay: PublishRelay<NSDiffableDataSourceSnapshot<SectionLayoutKind, DetailInfoSectionItem>> { get }
     var error: PublishRelay<Error> { get }
+    var dataSource: BehaviorRelay<[DetailInfoSectionItem]> { get }
 }
 
 protocol ShortsFeedViewModelType {
@@ -33,7 +28,7 @@ protocol ShortsFeedViewModelType {
     var outputs: ShortsFeedViewModelOutput { get }
 }
 
-// MARK: - ShortsFeedViewModel Implementation
+// MARK: - FeedViewModel Implementation
 
 final class ShortsFeedViewModel: ShortsFeedViewModelType, ShortsFeedViewModelInput, ShortsFeedViewModelOutput {
     
@@ -43,132 +38,163 @@ final class ShortsFeedViewModel: ShortsFeedViewModelType, ShortsFeedViewModelInp
     
     // MARK: - Input
     let viewDidLoad = PublishRelay<Void>()
+    let fetchTrigger: PublishSubject<Void>
+    let dataSource = BehaviorRelay<[DetailInfoSectionItem]>(value: [])
     
     // MARK: - Output
-    let dataSource = BehaviorRelay<[DetailInfoSectionItem]>(value: [])
-    let error = PublishRelay<Error>()
+    private let itemsRelay = BehaviorRelay<[DetailInfoSectionItem]>(value: [])
+    var error = PublishRelay<Error>()
+    let snapshotRelay = PublishRelay<NSDiffableDataSourceSnapshot<SectionLayoutKind, DetailInfoSectionItem>>()
+    var items: Driver<[DetailInfoSectionItem]>
     
-    // MARK: - State 관리
-//    private let state = MypageState(
-//        isLoading: BehaviorRelay<Bool>(value: false),
-//        currentPage: BehaviorRelay<Int>(value: 1),
-//        videos: BehaviorRelay<[Video]>(value: [])
-//    )
+    // MARK: - Properties (UseCase/ Mapper)
+    private let videoIDsRelay = BehaviorRelay<[String]>(value: [])
+    
+    private let youtubeUseCase: YoutubeVideosUseCase
+    private let youtubeMapper: DetailInfoSectionMapper
 
-    // MARK: - Properties
-    private let fetchUseCase: UseCaseProtocol_test
-    private let mapper: MypageMapper
     private let disposeBag = DisposeBag()
-    var onVideosUpdated: (([Video]) -> Void)?
+    
+    var somePartObservable: Observable<String> {
+        return Observable.just("snippet,contentDetails,statistics")
+    }
+    var someVideoIDsObservable: Observable<[String]> {
+        return Observable.just(["", "", ""])
+    }
+    let isLoading = BehaviorRelay<Bool>(value: false)
     
     // MARK: - Dummy Data
+    
     let dummyData: [DetailInfoSectionItem] = [
-        .Tag(["Asbf", "asd", "saf"]),
-        .Thumbnail([
-//            UIImage.Sample.sample1 ?? UIImage(),
-//            UIImage.Sample.sample1 ?? UIImage()
-        ]),
-        .Third([])
+        .Tag(["NPC", "NABBA", "WNGP"]),
+        .Thumbnail([VideoItem(
+            kind: "youtube#video",
+            etag: "someEtag",
+            id: "dQw4w9WgXcQ",
+            snippet: Snippet(
+                publishedAt: "2024-01-01T00:00:00Z",
+                channelId: "UC123456",
+                title: "Sample Video",
+                description: "This is a sample video description.",
+                thumbnails: Thumbnails(
+                    default: Thumbnail(url: "https://img.youtube.com/vi/dQw4w9WgXcQ/default.jpg", width: 120, height: 90),
+                    medium: Thumbnail(url: "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg", width: 320, height: 180),
+                    high: Thumbnail(url: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg", width: 480, height: 360),
+                    standard: nil,
+                    maxres: nil
+                ),
+                channelTitle: "Sample Channel",
+                tags: ["sample", "video"],
+                categoryId: "10",
+                liveBroadcastContent: "none",
+                defaultLanguage: nil,
+                localized: Localized(title: "Localized Sample Video", description: "Localized Description"),
+                defaultAudioLanguage: nil
+            ),
+            contentDetails: ContentDetails(duration: "PT4M30S", dimension: "2d", definition: "hd", caption: "false", licensedContent: true, contentRating: ContentRating(), projection: "rectangular"),
+            statistics: Statistics(viewCount: "1000", likeCount: "100", dislikeCount: nil, favoriteCount: nil, commentCount: "10")
+        )]),
+        .Third([UIImage.Icon.alarm_default!, UIImage.Icon.feed!, UIImage.Sample.sample1!])
     ]
     
+    
     // MARK: - Initializer
-    init(fetchUseCase: UseCaseProtocol_test, presentationMapper: MypageMapper) {
-        self.fetchUseCase = fetchUseCase
-        self.mapper = presentationMapper
-        setupBindings() // 안전한 호출
+    
+    init(
+        youtubeUseCase: YoutubeVideosUseCase,
+        youtubeMapper: DetailInfoSectionMapper
+    ) {
+        self.youtubeUseCase = youtubeUseCase
+        self.youtubeMapper = youtubeMapper
+    
+        self.items = itemsRelay.asDriver()
+        
+        self.fetchTrigger = PublishSubject<Void>()
     }
     
+    // MARK: - Binding
     
-    // MARK: - Setup Bindings
     private func setupBindings() {
-        viewDidLoad
-            .flatMapLatest { [weak self] _ -> Observable<[DetailInfoSectionItem]> in
-                guard let self = self else { return Observable.just([]) }
-                return self.fetchData2()
-                    .catch { [weak self] error in
-                        self?.error.accept(error)
-                        return .just([])
-                    }
-            }
-            .bind(to: dataSource)
+        fetchTrigger
+            .withUnretained(self)
+            .flatMapLatest { owner, _ -> Observable<[DetailInfoSectionItem]> in
+                  let videoIDsObservable: Observable<[String]> = owner.someVideoIDsObservable
+                  let partObservable: Observable<String> = owner.somePartObservable
+
+                  return Observable.combineLatest(videoIDsObservable, partObservable) { videoIDs, part in
+                      return owner.fetchYoutube(videoIDs: videoIDs, part: part)
+                  }
+                  .flatMapLatest { $0 }
+              }
+            .asDriver(onErrorJustReturn: [])
+            .drive(itemsRelay)
             .disposed(by: disposeBag)
+
+        itemsRelay
+            .asDriver(onErrorJustReturn: [])
+             .drive(itemsRelay)
+             .disposed(by: disposeBag)
     }
     
+    func bind() {
+        setupBindings()
+        viewDidLoad.bind(to: fetchTrigger).disposed(by: disposeBag)
+    }
+    
+    func fetchYoutube(videoIDs: [String], part: String) -> Observable<[DetailInfoSectionItem]> {
+        Observable.create { [weak self] observer -> Disposable in
+            guard let self = self else { return Disposables.create() }
+            
+            self.isLoading.accept(true)
+            
+            let id = videoIDs.joined(separator: ",")
+            
+            Task {
+                do {
+                    let domainVideos = try await self.youtubeUseCase.execute(id: id, part: part)
+                    let presentationVideos = self.youtubeMapper.transform(from: domainVideos)
+                    
+            var snapshot = NSDiffableDataSourceSnapshot<SectionLayoutKind, DetailInfoSectionItem>()
+                    snapshot.appendSections([.tags])
+                    snapshot.appendSections([.videoItem])
+                    snapshot.appendSections([.thirdSection])
+                    snapshot.appendItems(presentationVideos, toSection: .tags)
+                    snapshot.appendItems(presentationVideos, toSection: .videoItem)
+                    snapshot.appendItems(presentationVideos, toSection: .thirdSection)
+                    
+                    self.snapshotRelay.accept(snapshot)
+                    
+                    await MainActor.run {
+                        observer.onNext(presentationVideos)
+                        observer.onCompleted()
+                        
+                        self.isLoading.accept(false)
+                        
+                    }
+                } catch {
+                    await MainActor.run {
+                        print("Error occurred: \(error)")
+                        self.error.accept(error)
+                        self.isLoading.accept(false)
+                        observer.onError(error)
+                    }
+                }
+            }
+            return Disposables.create()
+        }
+    }
+    public func getVideoIDs() -> [String] {
+        return videoIDsRelay.value
+    }
     
     internal func handleButtonTap(for buttonType: ButtonType) {
         switch buttonType {
         case .NPC:
             print("NPC button tapped")
-        
         case .WNGP:
             print("WNGP button tapped")
-            // Do something for WNGP button tap
         case .NABBA:
             print("NABBA button tapped")
-            // Do something for NABBA button tap
         }
     }
-    internal func updateThumbnail(for indexPath: IndexPath) {
-        // Logic for updating the thumbnail at the given indexPath
-        print("Update thumbnail for row \(indexPath.row)")
-        // Example: You can update a thumbnail image or trigger some other UI update.
-    }
-    
-    private func fetchData2() -> Observable<[DetailInfoSectionItem]> {
-        // Sample 이미지 배열을 Thumbnail에 넣기
-        let sampleImages: [UIImage] = [
-            UIImage.Icon.apple!,
-            UIImage.Icon.alarm_default!,
-            UIImage.Sample.sample1!
-        ]
-        
-        let tagNames: [String] = [
-            "WNGP", "NABBA", "NPC"
-        ]
-        
-        let thirdImages: [UIImage] = [
-            UIImage.Icon.apple!,
-            UIImage.Icon.alarm_default!,
-            UIImage.Sample.sample1!
-        ]
-        
-        return Observable.just([.Thumbnail(sampleImages), .Tag(tagNames), .Third(thirdImages)])
-    }
-    // MARK: - Fetch Data
-//    private func fetchData() -> Observable<[DetailInfoSectionItem]> {
-//        
-//        Observable.create { [weak self] observer -> Disposable in
-//            guard let self = self else {
-//                observer.onCompleted()
-//                return Disposables.create()
-//            }
-//
-//            Task {
-//                do {
-//                    let entities = try await self.fetchUseCase.execute(lat: 4.0, lon: 4.0)
-//                    let mappedData = self.mapper.transform(entities) // 매핑된 데이터
-//                    print("Mapped data: \(mappedData)")
-//                    let sectionItems: [DetailInfoSectionItem] = mappedData.flatMap { model in
-//                        [
-//                            .Tag([model.id]),
-//                            .Thumbnail([UIImage.Sample.sample1 ?? UIImage()]),
-//                            .Third([Double(model.audienceCount)])
-//                        ]
-//                    }
-//                    observer.onNext(sectionItems) // 변환된 데이터 방출
-//                    observer.onCompleted()
-//                } catch {
-//                    print("Error fetching data: \(error)")
-//                    // 예외 발생 시 에러를 PublishRelay에 전달하고, dummyData를 사용
-//                    self.error.accept(error)
-//                    observer.onNext(self.dummyData) // 더미 데이터를 반환
-//                    observer.onCompleted()
-//                }
-//            }
-//
-//            return Disposables.create()
-//        }
-//    }
-    
-
 }

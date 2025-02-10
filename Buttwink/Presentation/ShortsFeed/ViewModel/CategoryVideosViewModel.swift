@@ -56,5 +56,5 @@ final class CategoryVideosViewModel: CategoryViewModelInput, CategoryViewModelOu
         return Observable.just([.CategoryVideo([1, 2, 3, 4, 5])])
     }
     
-
+    
 }

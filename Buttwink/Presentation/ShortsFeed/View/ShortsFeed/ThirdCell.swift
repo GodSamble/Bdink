@@ -19,7 +19,7 @@ final class ThirdCell: BaseCollectionViewCell<Any> {
     private var bag = DisposeBag()
     
     // MARK: - UI Components
-
+    
     private let imageView: UIImageView = {
         let view = UIImageView()
         view.image = .Sample.sample1

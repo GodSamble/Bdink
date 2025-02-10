@@ -9,7 +9,7 @@ import UIKit
 
 enum ButtonType {
     case WNGP, NABBA, NPC
-
+    
     // from 메서드 추가
     static func from(_ tag: String) -> ButtonType {
         switch tag {

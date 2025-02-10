@@ -4,6 +4,8 @@
 <dict>
 	<key>BASE_URL</key>
 	<string>$(BASE_URL)</string>
+	<key>YoutubeAPIKey</key>
+	<string>AIzaSyDGe9B-UCuhcfqw1ege7CWd1PVFcjbkRJ8</string>
 	<key>CFBundleExecutable</key>
 	<string></string>
 	<key>NSAppTransportSecurity</key>

@@ -15,41 +15,16 @@ import Moya
 import YouTubePlayerKit
 import SwiftUI
 
-// MARK: - Section Data
-enum DetailInfoSectionItem: Hashable {
-    case Tag([String])
-    case Thumbnail([UIImage])
-    case Third([UIImage])
-    
-    public func getSectionLayoutKind() -> SectionLayoutKind {
-        switch self {
-        case .Tag: return .tags
-        case .Thumbnail: return .thumbnails
-        case .Third: return .thirdSection
-        }
-    }
-}
-// MARK: - Item
-enum SectionLayoutKind: Int, CaseIterable, Hashable {
-    case tags, thumbnails, thirdSection
-}
-
-// MARK: - View Controller
-
 final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate, ViewModelBindableType, HeaderViewDelegate {
+    
+    // MARK: - Property
     
     let categoryViewModel = CategoryVideosViewModel()
     
     let videoURLs: [String] = [
-      "https://www.youtube.com/shorts/q3ZOdrWTbl8",
-      "https://www.youtube.com/shorts/sj_BoRg7pS8",
-      "https://www.youtube.com/shorts/Rp5GI1wdHMs"
-    ]
-    
-    let sampleImages: [UIImage] = [
-        UIImage.Icon.alarm_default!,
-        UIImage.Icon.feed!,
-        UIImage.Sample.sample1!
+        "https://www.youtube.com/shorts/q3ZOdrWTbl8",
+        "https://www.youtube.com/shorts/sj_BoRg7pS8",
+        "https://www.youtube.com/shorts/Rp5GI1wdHMs"
     ]
     let tagNames: [String] = ["NPC", "WNGP", "NABBA"]
     let thirdImages: [UIImage] = [
@@ -57,15 +32,15 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         UIImage.Icon.feed!,
         UIImage.Sample.sample1!
     ]
-
     
     var selectedTag: String? = nil
     var viewModel: ShortsFeedViewModel!
     var disposeBag = DisposeBag()
     
+    private var currentSnapshot: NSDiffableDataSourceSnapshot<SectionLayoutKind, DetailInfoSectionItem> = NSDiffableDataSourceSnapshot()
     
-    // DiffableDataSource 관련 속성 초기화
-    private var currentSnapshot = NSDiffableDataSourceSnapshot<SectionLayoutKind, DetailInfoSectionItem>()
+    private let snapshotRelay = BehaviorRelay<NSDiffableDataSourceSnapshot<SectionLayoutKind, DetailInfoSectionItem>>(value: NSDiffableDataSourceSnapshot())
+    
     private var dataSource: UICollectionViewDiffableDataSource<SectionLayoutKind, DetailInfoSectionItem>!
     
     private lazy var collectionView: UICollectionView = {
@@ -82,21 +57,21 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         return collectionView
     }()
     
+    // MARK: - Init
+    
     convenience init() {
-        let networkService = TestService()
-        //        let boxOfficeMapper = DefaultMypageDataMapper()
-        let repository = Repository_test(service: networkService
-        )
-        let fetchUseCase = UseCase_test(
-            repositoryInterface: repository
-        )
-        let presentationMapper = DefaultMypagePresentationMapper()
+        let networkService = DefaultYoutubeNetworkService()
+        let youtubeMapper = DetailInfoSectionMapperImpl()
         
+        let repository = Repository_Youtube(networkService: networkService, mapper: youtubeMapper as! Mappers_YoutubeData)
+        let youtubeUseCase = FetchYoutubeVideosUseCase(
+            repositoryInterface_Youtube: repository
+        )
+        let youtubePresentationMapper = DetailInfoSectionMapperImpl()
         let viewModel = ShortsFeedViewModel(
-            fetchUseCase: fetchUseCase,
-            presentationMapper: presentationMapper
+            youtubeUseCase: youtubeUseCase,
+            youtubeMapper: youtubePresentationMapper
         )
-        
         self.init(viewModel: viewModel)
     }
     
@@ -105,6 +80,7 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         super.init(nibName: nil, bundle: nil)
     }
     
+    // MARK: - LifeCycle
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -114,41 +90,80 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         setLayout()
         setupDataSource()
         bindViewModel()
-        viewModel.dataSource.accept(viewModel.dummyData) // 캐싱하는 방식 채택으로 성능 상승 & 사용자 입장에서, 처음에 데이터불러와지는 이질감 제거. // TODO: 스켈레톤 UI
+        
+        // 초기 더미 데이터로 캐시된 데이터 로드 (빠르게 UI 렌더링)
+        viewModel.dataSource.accept(viewModel.dummyData)
         viewModel.inputs.viewDidLoad.accept(())
-        updateSnapshot()
+        
+        // 기본 스냅샷 업데이트 (기존 데이터로 UI 초기화)
+        updateSnapshot(with: viewModel.dummyData)
+        
+        // 비동기적으로 새로운 데이터를 받아온 후 업데이트
+        fetchNewData()
     }
     
-    typealias Task = _Concurrency.Task
+    // MARK: - Binding & Network
+    
+    func fetchNewData() {
+        let videoIDs = viewModel.getVideoIDs()
+        let part = "snippet,contentDetails"
+        
+        viewModel.fetchYoutube(videoIDs: videoIDs, part: part)
+            .subscribe(onNext: { [weak self] newData in
+                self?.updateSnapshot(with: newData)
+            })
+            .disposed(by: disposeBag)
+    }
     
     func bindViewModel() {
-        // DataSource 바인딩
-        viewModel.outputs.dataSource
+        
+        viewModel.snapshotRelay
             .observe(on: MainScheduler.instance)
-            .bind(to: dataSourceBinder)
+            .bind { [weak self] snapshot in
+            }
             .disposed(by: disposeBag)
         
-        // ViewDidLoad 이벤트 처리
+        viewModel.outputs.dataSource
+            .subscribe(onNext: { data in
+                print("Received data: \(data)")
+            })
+            .disposed(by: disposeBag)
+        
         rx.viewWillAppear
             .take(1)
             .bind(to: viewModel.inputs.viewDidLoad)
             .disposed(by: disposeBag)
         
-        // 에러 처리 (옵션으로 추가 가능)
         viewModel.outputs.error
             .subscribe(onNext: { [weak self] error in
             })
             .disposed(by: disposeBag)
-        
     }
     
-    // MARK: - Layout
-    
-    private func setLayout() {
-        view.backgroundColor = .clear
-        view.addSubview(collectionView)
-        collectionView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+    var dataSourceBinder: Binder<[DetailInfoSectionItem]> {
+        return Binder(self) { view, data in
+            var currentSnapshot = NSDiffableDataSourceSnapshot<SectionLayoutKind, DetailInfoSectionItem>()
+            
+            SectionLayoutKind.allCases.forEach { section in
+                currentSnapshot.appendSections([section])
+            }
+            
+            for item in data {
+                let section = item.getSectionLayoutKind()
+                var items: [DetailInfoSectionItem] = []
+                
+                // Section별 아이템 생성
+                switch item {
+                case .Tag(let tags):
+                    items = tags.map { DetailInfoSectionItem.Tag([$0]) }
+                case .Thumbnail(let images):
+                    items = [DetailInfoSectionItem.Thumbnail(images)]
+                case .Third(let strings):
+                    items = strings.map { DetailInfoSectionItem.Third([$0]) }
+                }
+                currentSnapshot.appendItems(items, toSection: section)
+            }
+            view.dataSource.apply(currentSnapshot, animatingDifferences: true)
         }
     }
     
@@ -166,9 +181,9 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
                     ) as? TagCell else {
                         return nil
                     }
-                    let dynamicCount = indexPath.row % self.sampleImages.count + 1
+                    let dynamicCount = indexPath.row % self.viewModel.dummyData.count + 1
                     cell.configure(with: self.tagNames, with: dynamicCount)
-
+                    
                     cell.buttonTapSubject
                         .observe(on: MainScheduler.instance)
                         .subscribe(onNext: { [weak self] buttonType in
@@ -185,18 +200,22 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
                         })
                         .disposed(by: cell.disposeBag)
                     return cell
-                case .Thumbnail( _):
+                    
+                case .Thumbnail( let data):
                     guard let cell = collectionView.dequeueReusableCell(
                         withReuseIdentifier: ThumbnailCell.identifier,
                         for: indexPath
                     ) as? ThumbnailCell else {
-                        return nil
+                        return UICollectionViewCell()
                     }
-                    // indexPath.row를 기반으로 count 전달
-                    let dynamicCount = indexPath.row % self.sampleImages.count + 1
-                    cell.configure(with: self.sampleImages, with: dynamicCount)
-                    self.viewModel.updateThumbnail(for: indexPath)
+                    if !data.isEmpty {
+                        cell.configure(data)
+                    } else {
+                        return UICollectionViewCell()
+                    }
+                    
                     return cell
+                    
                 case .Third(_):
                     guard let cell = collectionView.dequeueReusableCell(
                         withReuseIdentifier: ThirdCell.identifier,
@@ -204,13 +223,12 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
                     ) as? ThirdCell else {
                         return nil
                     }
-                    let dynamicCount = indexPath.row % self.sampleImages.count + 1
+                    let dynamicCount = indexPath.row % self.viewModel.dummyData.count + 1
                     cell.configure(with: self.thirdImages, with: dynamicCount)
                     return cell
                 }
             }
         )
-        
         
         dataSource.supplementaryViewProvider = { (collectionView, kind, indexPath) -> UICollectionReusableView? in
             if kind == UICollectionView.elementKindSectionHeader {
@@ -228,6 +246,40 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         }
     }
     
+    // MARK: - Snapshot
+    
+    private func updateSnapshot(with data: [DetailInfoSectionItem]) {
+        var snapshot = NSDiffableDataSourceSnapshot<SectionLayoutKind, DetailInfoSectionItem>()
+        snapshot.appendSections(SectionLayoutKind.allCases)
+        
+        for item in data {
+            let section = item.getSectionLayoutKind()
+            var items: [DetailInfoSectionItem] = []
+            
+            switch item {
+            case .Tag(let tags):
+                items = [DetailInfoSectionItem.Tag(tags)]
+            case .Thumbnail(let videoItem):
+                items = [DetailInfoSectionItem.Thumbnail(videoItem)]
+            case .Third(let strings):
+                items = [DetailInfoSectionItem.Third(strings)]
+            }
+            
+            snapshot.appendItems(items, toSection: section)
+        }
+        snapshotRelay.accept(snapshot)
+        dataSource.apply(snapshot, animatingDifferences: true)
+    }
+    
+    // MARK: - CompositionalLayout
+    
+    private func setLayout() {
+        view.backgroundColor = .clear
+        view.addSubview(collectionView)
+        collectionView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+    }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let sectionKind = SectionLayoutKind(rawValue: section) else {
@@ -244,7 +296,7 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
             switch sectionKind {
             case .tags:
                 return self?.createTagCellSection(withHeader: false)
-            case .thumbnails:
+            case .videoItem:
                 return self?.createThumbnailCellSection(withHeader: false)
             case .thirdSection:
                 return self?.createThridSection(withHeader: true)
@@ -253,7 +305,28 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         return layout
     }
     
-    
+    func updateSnapshotWithItems() {
+        // 현재 스냅샷에 .thumbnails 섹션이 존재하는지 확인
+        if currentSnapshot.sectionIdentifiers.contains(.videoItem) == false {
+            // 섹션이 없으면 섹션을 추가
+            currentSnapshot.appendSections([.videoItem])
+        }
+        
+        // .third 섹션에 대해서는 헤더를 추가하고, 항목을 추가하는 방식으로 처리
+        if currentSnapshot.sectionIdentifiers.contains(.thirdSection) == false {
+            // 섹션 추가
+            currentSnapshot.appendSections([.thirdSection])
+        }
+        
+        // .third 섹션에 헤더가 추가되는 경우, 헤더를 true로 설정 (헤더가 추가되도록)
+        currentSnapshot.appendItems(viewModel.outputs.dataSource.value, toSection: .thirdSection)
+        
+        // .thumbnails 섹션에 아이템을 추가하는 방식
+        currentSnapshot.appendItems(viewModel.outputs.dataSource.value, toSection: .videoItem)
+        
+        // 변경된 스냅샷을 데이터 소스에 적용
+        dataSource.apply(currentSnapshot, animatingDifferences: true)
+    }
     
     private func createTagCellSection(withHeader: Bool) -> NSCollectionLayoutSection { //✅
         let itemSize = NSCollectionLayoutSize(
@@ -261,7 +334,7 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
             heightDimension: .estimated(33)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-
+        
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
@@ -288,7 +361,7 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
             heightDimension: .fractionalHeight(1.0)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-
+        
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .estimated(2000),
             heightDimension: .estimated(356)
@@ -315,7 +388,7 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         return section
     }
     
-    private func createThridSection(withHeader: Bool) -> NSCollectionLayoutSection { // MARK: 정사각형✅
+    private func createThridSection(withHeader: Bool) -> NSCollectionLayoutSection { // ✅
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(1.0)
@@ -348,53 +421,12 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         return section
     }
     
-    private func updateSnapshot() {
-        currentSnapshot.deleteAllItems()
-        currentSnapshot.appendSections(SectionLayoutKind.allCases)
-        currentSnapshot.appendItems(viewModel.outputs.dataSource.value, toSection: .thumbnails)
-        dataSource.apply(currentSnapshot, animatingDifferences: true)
-    }
-    
-    var dataSourceBinder: Binder<[DetailInfoSectionItem]> {
-        return Binder(self) { view, data in
-            // Snapshot 초기화
-            view.currentSnapshot = NSDiffableDataSourceSnapshot<SectionLayoutKind, DetailInfoSectionItem>()
-            
-            // 모든 섹션 추가
-            SectionLayoutKind.allCases.forEach { section in
-                view.currentSnapshot.appendSections([section])
-            }
-            
-            // 데이터 처리
-            for item in data {
-                let section = item.getSectionLayoutKind()
-                var items: [DetailInfoSectionItem] = []
-                
-                // Section별 아이템 생성
-                switch item {
-                case .Tag(let tags):
-                    items = tags.map { DetailInfoSectionItem.Tag([$0]) }
-                case .Thumbnail(let images):
-                    items = images.map { DetailInfoSectionItem.Thumbnail([$0]) }
-                case .Third(let strings):
-                    items = strings.map { DetailInfoSectionItem.Third([$0]) }
-                }
-                
-                // 아이템을 섹션에 추가
-                view.currentSnapshot.appendItems(items, toSection: section)
-            }
-            
-            // Snapshot 적용
-            view.dataSource.apply(view.currentSnapshot, animatingDifferences: true)
-        }
-    }
-    
     // MARK: 화면전환(w.델리게이트)
     
-//    func didTapHeaderButton() {
-//        let categoryVC = CategoryVideosViewController(viewModel: categoryViewModel)
-//        navigationController?.pushViewController(categoryVC, animated: true)
-//    }
+    //    func didTapHeaderButton() {
+    //        let categoryVC = CategoryVideosViewController(viewModel: categoryViewModel)
+    //        navigationController?.pushViewController(categoryVC, animated: true)
+    //    }
     
     func didTapHeaderButton() {
         // ContentView 생성
@@ -406,9 +438,6 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         // 네비게이션 컨트롤러로 푸시
         navigationController?.pushViewController(pagingScrollView, animated: true)
     }
-    
-    
-
     
     func getButtonType(from buttonName: String) -> ButtonType {
         if buttonName.contains("WNGP") {
