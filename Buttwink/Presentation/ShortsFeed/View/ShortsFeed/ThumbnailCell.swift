@@ -18,7 +18,7 @@ final class ThumbnailCell: BaseCollectionViewCell<Any> {
     
     static let identifier: String = "ThumbnailCell"
     private var bag = DisposeBag()
-    private var thumbnail: [UIImageView] = []
+    var thumbnail: UIImageView? = nil
     var previousThumbnail: UIImageView? = nil
     
     var currentPage = 1
@@ -31,7 +31,7 @@ final class ThumbnailCell: BaseCollectionViewCell<Any> {
     
     // MARK: - UI Components
     
-    private let imageView: UIImageView = {
+    let imageView: UIImageView = {
         let view = UIImageView()
         view.backgroundColor = .white
         view.layer.cornerRadius = 8
@@ -66,7 +66,7 @@ final class ThumbnailCell: BaseCollectionViewCell<Any> {
         imageView.image = nil
         imageView.kf.cancelDownloadTask() // 기존 이미지 다운로드 취소
         previousThumbnail = nil
-        thumbnail.removeAll()
+        //        thumbnail.removeAll()
         bag = DisposeBag() // RxSwift DisposeBag 재설정
     }
     
@@ -99,57 +99,55 @@ final class ThumbnailCell: BaseCollectionViewCell<Any> {
         
     }
     
-    func configure(_ videoItems: [VideoItem]) {
-        // 기존 썸네일 이미지뷰 초기화
-        thumbnailImageViews.forEach { $0.removeFromSuperview() }
-        thumbnailImageViews.removeAll()
-
+    func configure(with videoItems: [Entity_YoutubeData], with count: Int) {
         // URL 배열 생성 (최대 10개까지만 가져오기)
-        let urls = videoItems.prefix(10).compactMap { $0.snippet.thumbnails.default.url }
+        let urls = videoItems.prefix(10).compactMap { $0.thumbnailUrl }
         
         var previousView: UIImageView? = nil
-
+        
         for urlString in urls {
             guard let url = URL(string: urlString) else {
-                       print("⚠️ 잘못된 URL: \(urlString)")
-                       continue
-                   }
+                print("⚠️ 잘못된 URL: \(urlString)")
+                continue
+            }
             
             let imageView = UIImageView()
-                   imageView.kf.setImage(
-                       with: url,
-                       placeholder: UIImage(named: "placeholder"),
-                       options: [
-                           .transition(.fade(0.3)),
-                           .cacheOriginalImage
-                       ]
-                   ) { result in
-                       switch result {
-                       case .success(let value):
-                           print("✅ 이미지 로드 성공: \(value.source.url?.absoluteString ?? "알 수 없음")")
-                       case .failure(let error):
-                           print("❌ 이미지 로드 실패: \(error.localizedDescription)")
-                       }
-                   }
+            imageView.kf.setImage(
+                with: url,
+                placeholder: UIImage(named: "placeholder"),
+                options: [
+                    .transition(.fade(0.3)),
+                    .cacheOriginalImage
+                ]
+            ) { result in
+                switch result {
+                case .success(let value):
+                    print("✅ 이미지 로드 성공: \(value.source.url?.absoluteString ?? "알 수 없음")")
+                case .failure(let error):
+                    print("❌ 이미지 로드 실패: \(error.localizedDescription)")
+                }
+            }
             imageView.contentMode = .scaleAspectFill
             imageView.clipsToBounds = true
             imageView.layer.cornerRadius = 8
             imageView.translatesAutoresizingMaskIntoConstraints = false
-
+            
             self.addSubview(imageView)
             thumbnailImageViews.append(imageView)
-
+            
             // 오토레이아웃 설정
             imageView.snp.makeConstraints { make in
                 make.width.equalToSuperview()
                 make.height.equalToSuperview()
                 make.edges.equalToSuperview()
             }
-
+            
             previousView = imageView
         }
-
+        
         // 아이템 URL 저장
         items = urls
+        
+        
     }
 }

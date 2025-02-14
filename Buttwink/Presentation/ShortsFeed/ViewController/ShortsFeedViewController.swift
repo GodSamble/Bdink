@@ -19,14 +19,28 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
     
     // MARK: - Property
     
-    let categoryViewModel = CategoryVideosViewModel()
-    
-    let videoURLs: [String] = [
-        "https://www.youtube.com/shorts/q3ZOdrWTbl8",
-        "https://www.youtube.com/shorts/sj_BoRg7pS8",
-        "https://www.youtube.com/shorts/Rp5GI1wdHMs"
+    let itemsSet: Set<DetailInfoSectionItem> = [
+        .Tag(["Swift"]),
+        .Thumbnail([]),
+        .Third([UIImage()])
     ]
-    let tagNames: [String] = ["NPC", "WNGP", "NABBA"]
+
+    // 예를 들어, Thumbnail 타입만 필터링
+    var filteredItems: [DetailInfoSectionItem] {
+        itemsSet.filter {
+            switch $0 {
+            case .Thumbnail, .Tag, .Third:
+                return true
+            default:
+                return false
+            }
+         
+        }
+    }
+    
+    var uniqueItems: Set<DetailInfoSectionItem> = []
+    let categoryViewModel = CategoryVideosViewModel()
+//    let tagNames: [String] = ["NPC", "WNGP", "NABBA"]
     let thirdImages: [UIImage] = [
         UIImage.Icon.alarm_default!,
         UIImage.Icon.feed!,
@@ -90,25 +104,34 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         setLayout()
         setupDataSource()
         bindViewModel()
+        if let youtubeAPIKey = Bundle.main.object(forInfoDictionaryKey: "YOUTUBE_API_KEY") as? String {
+            // API 키를 사용하여 서버 통신 수행
+            print("API Key: \(youtubeAPIKey)")
+        } else {
+            print("API 키가 설정되지 않았습니다.")
+        }
         
         // 초기 더미 데이터로 캐시된 데이터 로드 (빠르게 UI 렌더링)
-        viewModel.dataSource.accept(viewModel.dummyData)
-        viewModel.inputs.viewDidLoad.accept(())
+//        viewModel.dataSource.accept(viewModel.dummyData)
+        fetchNewData()
+//        viewModel.inputs.viewDidLoad.accept(())
+//        viewModel.bind()
         
         // 기본 스냅샷 업데이트 (기존 데이터로 UI 초기화)
         updateSnapshot(with: viewModel.dummyData)
         
         // 비동기적으로 새로운 데이터를 받아온 후 업데이트
-        fetchNewData()
+
     }
     
     // MARK: - Binding & Network
     
     func fetchNewData() {
-        let videoIDs = viewModel.getVideoIDs()
-        let part = "snippet,contentDetails"
+        let query = "트포이"
+        let maxResults = 20
         
-        viewModel.fetchYoutube(videoIDs: videoIDs, part: part)
+        //        viewModel.fetchYoutube(videoIDs: videoIDs, part: part)
+        viewModel.fetchYoutube(query: query, maxResults: maxResults)
             .subscribe(onNext: { [weak self] newData in
                 self?.updateSnapshot(with: newData)
             })
@@ -157,7 +180,7 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
                 case .Tag(let tags):
                     items = tags.map { DetailInfoSectionItem.Tag([$0]) }
                 case .Thumbnail(let images):
-                    items = [DetailInfoSectionItem.Thumbnail(images)]
+                    items = images.map { DetailInfoSectionItem.Thumbnail([$0])}
                 case .Third(let strings):
                     items = strings.map { DetailInfoSectionItem.Third([$0]) }
                 }
@@ -166,6 +189,7 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
             view.dataSource.apply(currentSnapshot, animatingDifferences: true)
         }
     }
+
     
     // MARK: - Data Source
     
@@ -174,7 +198,7 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
             collectionView: collectionView,
             cellProvider: { (collectionView, indexPath, item) -> UICollectionViewCell? in
                 switch item {
-                case .Tag( _):
+                case .Tag(let data):
                     guard let cell = collectionView.dequeueReusableCell(
                         withReuseIdentifier: TagCell.identifier,
                         for: indexPath
@@ -182,7 +206,7 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
                         return nil
                     }
                     let dynamicCount = indexPath.row % self.viewModel.dummyData.count + 1
-                    cell.configure(with: self.tagNames, with: dynamicCount)
+                    cell.configure(with: data, with: dynamicCount)
                     
                     cell.buttonTapSubject
                         .observe(on: MainScheduler.instance)
@@ -201,15 +225,16 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
                         .disposed(by: cell.disposeBag)
                     return cell
                     
-                case .Thumbnail( let data):
+                case .Thumbnail(let data):
                     guard let cell = collectionView.dequeueReusableCell(
                         withReuseIdentifier: ThumbnailCell.identifier,
                         for: indexPath
                     ) as? ThumbnailCell else {
                         return UICollectionViewCell()
                     }
+                    let dynamicCount = indexPath.row % self.viewModel.dummyData.count + 1
                     if !data.isEmpty {
-                        cell.configure(data)
+                        cell.configure(with: data, with: dynamicCount)
                     } else {
                         return UICollectionViewCell()
                     }
@@ -252,22 +277,31 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         var snapshot = NSDiffableDataSourceSnapshot<SectionLayoutKind, DetailInfoSectionItem>()
         snapshot.appendSections(SectionLayoutKind.allCases)
         
+        var uniqueItems = Set<DetailInfoSectionItem>() // 중복 제거를 위한 Set
+        
         for item in data {
             let section = item.getSectionLayoutKind()
+            
             var items: [DetailInfoSectionItem] = []
             
             switch item {
             case .Tag(let tags):
-                items = [DetailInfoSectionItem.Tag(tags)]
+                items = tags.map { DetailInfoSectionItem.Tag([$0]) } // ✅ 개별 아이템으로 분리
             case .Thumbnail(let videoItem):
-                items = [DetailInfoSectionItem.Thumbnail(videoItem)]
+                items = videoItem.map { DetailInfoSectionItem.Thumbnail([$0]) } // ✅ 개별 썸네일 분리
             case .Third(let strings):
-                items = [DetailInfoSectionItem.Third(strings)]
+                items = strings.map { DetailInfoSectionItem.Third([$0]) } // ✅ 개별 문자열 분리
             }
-            
-            snapshot.appendItems(items, toSection: section)
+            uniqueItems.formUnion(items)
+//            snapshot.appendItems(items, toSection: section)
         }
-        snapshotRelay.accept(snapshot)
+        
+        for section in SectionLayoutKind.allCases {
+            let filteredItems = Array(uniqueItems).filter { $0.getSectionLayoutKind() == section }
+            snapshot.appendItems(filteredItems, toSection: section)
+        }
+      
+//        snapshotRelay.accept(snapshot)
         dataSource.apply(snapshot, animatingDifferences: true)
     }
     
@@ -304,8 +338,13 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         }
         return layout
     }
-    
+
     func updateSnapshotWithItems() {
+        // 현재 스냅샷에 .thumbnails 섹션이 존재하는지 확인
+        if currentSnapshot.sectionIdentifiers.contains(.tags) == false {
+            // 섹션이 없으면 섹션을 추가
+            currentSnapshot.appendSections([.tags])
+        }
         // 현재 스냅샷에 .thumbnails 섹션이 존재하는지 확인
         if currentSnapshot.sectionIdentifiers.contains(.videoItem) == false {
             // 섹션이 없으면 섹션을 추가
@@ -318,6 +357,7 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
             currentSnapshot.appendSections([.thirdSection])
         }
         
+        currentSnapshot.appendItems(viewModel.outputs.dataSource.value, toSection: .tags)
         // .third 섹션에 헤더가 추가되는 경우, 헤더를 true로 설정 (헤더가 추가되도록)
         currentSnapshot.appendItems(viewModel.outputs.dataSource.value, toSection: .thirdSection)
         

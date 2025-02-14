@@ -89,6 +89,7 @@
 		BF88F4722D425DFD00B862F4 /* ShortsMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF88F4712D425DFD00B862F4 /* ShortsMapper.swift */; };
 		BF88F4742D425E6A00B862F4 /* ShortsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF88F4732D425E6A00B862F4 /* ShortsModel.swift */; };
 		BF9132322D5A19190068C9F1 /* CommonRxDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9132312D5A19190068C9F1 /* CommonRxDataSource.swift */; };
+		BF9132342D5B3C4B0068C9F1 /* DTO_YoutubeSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9132332D5B3C4B0068C9F1 /* DTO_YoutubeSearch.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -188,6 +189,7 @@
 		BF88F4712D425DFD00B862F4 /* ShortsMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortsMapper.swift; sourceTree = "<group>"; };
 		BF88F4732D425E6A00B862F4 /* ShortsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortsModel.swift; sourceTree = "<group>"; };
 		BF9132312D5A19190068C9F1 /* CommonRxDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonRxDataSource.swift; sourceTree = "<group>"; };
+		BF9132332D5B3C4B0068C9F1 /* DTO_YoutubeSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTO_YoutubeSearch.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -530,6 +532,7 @@
 				BF88F45F2D3FF56400B862F4 /* API_YoutubeData.swift */,
 				BF88F4612D3FF7E100B862F4 /* Service_YoutubeData.swift */,
 				BF88F4652D4231F800B862F4 /* DTO_YoutubeData.swift */,
+				BF9132332D5B3C4B0068C9F1 /* DTO_YoutubeSearch.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -748,6 +751,7 @@
 				1D999D492CE0BADA004A4029 /* ViewController.swift in Sources */,
 				1D8067D62D0078B7002456FD /* URLConstant.swift in Sources */,
 				1D999D912CE11797004A4029 /* TabBarController.swift in Sources */,
+				BF9132342D5B3C4B0068C9F1 /* DTO_YoutubeSearch.swift in Sources */,
 				BF88F4702D42519800B862F4 /* Usecase_Youtube.swift in Sources */,
 				1D8067CE2D0077F8002456FD /* Encodable.swift in Sources */,
 				1D999D872CE1151B004A4029 /* UILabel+.swift in Sources */,

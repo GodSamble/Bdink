@@ -54,12 +54,12 @@ final class ShortsFeedViewModel: ShortsFeedViewModelType, ShortsFeedViewModelInp
     private let youtubeMapper: DetailInfoSectionMapper
 
     private let disposeBag = DisposeBag()
-    
-    var somePartObservable: Observable<String> {
-        return Observable.just("snippet,contentDetails,statistics")
+
+    var somePartObservable: Observable<Int> {
+        return Observable.just(20)
     }
-    var someVideoIDsObservable: Observable<[String]> {
-        return Observable.just(["", "", ""])
+    var someVideoIDsObservable: Observable<String> {
+        return Observable.just("트포이")
     }
     let isLoading = BehaviorRelay<Bool>(value: false)
     
@@ -67,33 +67,7 @@ final class ShortsFeedViewModel: ShortsFeedViewModelType, ShortsFeedViewModelInp
     
     let dummyData: [DetailInfoSectionItem] = [
         .Tag(["NPC", "NABBA", "WNGP"]),
-        .Thumbnail([VideoItem(
-            kind: "youtube#video",
-            etag: "someEtag",
-            id: "dQw4w9WgXcQ",
-            snippet: Snippet(
-                publishedAt: "2024-01-01T00:00:00Z",
-                channelId: "UC123456",
-                title: "Sample Video",
-                description: "This is a sample video description.",
-                thumbnails: Thumbnails(
-                    default: Thumbnail(url: "https://img.youtube.com/vi/dQw4w9WgXcQ/default.jpg", width: 120, height: 90),
-                    medium: Thumbnail(url: "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg", width: 320, height: 180),
-                    high: Thumbnail(url: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg", width: 480, height: 360),
-                    standard: nil,
-                    maxres: nil
-                ),
-                channelTitle: "Sample Channel",
-                tags: ["sample", "video"],
-                categoryId: "10",
-                liveBroadcastContent: "none",
-                defaultLanguage: nil,
-                localized: Localized(title: "Localized Sample Video", description: "Localized Description"),
-                defaultAudioLanguage: nil
-            ),
-            contentDetails: ContentDetails(duration: "PT4M30S", dimension: "2d", definition: "hd", caption: "false", licensedContent: true, contentRating: ContentRating(), projection: "rectangular"),
-            statistics: Statistics(viewCount: "1000", likeCount: "100", dislikeCount: nil, favoriteCount: nil, commentCount: "10")
-        )]),
+        .Thumbnail([Entity_YoutubeData(videoId: "S3KEgDlkxC8", title: "CBUM 내년 우승 힘든 이유", thumbnailUrl: "", channelId: "UCgUmXnb08jZ6Ser6YoFGQBg", channelName: "TFE 트포이", channelThumbnailUrl: "https://i.ytimg.com/vi/S3KEgDlkxC8/default.jpg")]),
         .Third([UIImage.Icon.alarm_default!, UIImage.Icon.feed!, UIImage.Sample.sample1!])
     ]
     
@@ -118,40 +92,35 @@ final class ShortsFeedViewModel: ShortsFeedViewModelType, ShortsFeedViewModelInp
         fetchTrigger
             .withUnretained(self)
             .flatMapLatest { owner, _ -> Observable<[DetailInfoSectionItem]> in
-                  let videoIDsObservable: Observable<[String]> = owner.someVideoIDsObservable
-                  let partObservable: Observable<String> = owner.somePartObservable
+                let videoIDsObservable: Observable<String> = owner.someVideoIDsObservable
+                let partObservable: Observable<Int> = owner.somePartObservable
 
-                  return Observable.combineLatest(videoIDsObservable, partObservable) { videoIDs, part in
-                      return owner.fetchYoutube(videoIDs: videoIDs, part: part)
-                  }
-                  .flatMapLatest { $0 }
-              }
+                return Observable.combineLatest(videoIDsObservable, partObservable) { query, maxResults in
+                    return owner.fetchYoutube(query: query, maxResults: maxResults)
+                }
+                .flatMapLatest { $0 }
+                .catchAndReturn([])
+            }
             .asDriver(onErrorJustReturn: [])
             .drive(itemsRelay)
             .disposed(by: disposeBag)
-
-        itemsRelay
-            .asDriver(onErrorJustReturn: [])
-             .drive(itemsRelay)
-             .disposed(by: disposeBag)
     }
+
     
     func bind() {
         setupBindings()
         viewDidLoad.bind(to: fetchTrigger).disposed(by: disposeBag)
     }
     
-    func fetchYoutube(videoIDs: [String], part: String) -> Observable<[DetailInfoSectionItem]> {
+    func fetchYoutube(query: String, maxResults: Int) -> Observable<[DetailInfoSectionItem]> {
         Observable.create { [weak self] observer -> Disposable in
             guard let self = self else { return Disposables.create() }
             
             self.isLoading.accept(true)
             
-            let id = videoIDs.joined(separator: ",")
-            
             Task {
                 do {
-                    let domainVideos = try await self.youtubeUseCase.execute(id: id, part: part)
+                    let domainVideos = try await self.youtubeUseCase.execute(query: query, maxResults: maxResults)
                     let presentationVideos = self.youtubeMapper.transform(from: domainVideos)
                     
             var snapshot = NSDiffableDataSourceSnapshot<SectionLayoutKind, DetailInfoSectionItem>()

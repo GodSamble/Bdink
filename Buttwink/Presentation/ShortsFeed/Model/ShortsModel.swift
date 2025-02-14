@@ -13,7 +13,7 @@ import UIKit
 enum DetailInfoSectionItem: Hashable, Equatable {
     
     case Tag([String])
-    case Thumbnail([VideoItem])
+    case Thumbnail([Entity_YoutubeData])
     case Third([UIImage])
     
     public func getSectionLayoutKind() -> SectionLayoutKind {

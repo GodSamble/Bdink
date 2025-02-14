@@ -17,8 +17,8 @@ final class Repository_Youtube: RepositoryInterface_Youtube {
         self.mapper = mapper
     }
     
-    func fetchYoutubeVideoList(id: String, part: String) async throws -> [Entity_YoutubeData] {
-        let dto = try await networkService.fetchYoutubeData(id: id, part: part)
+    func fetchYoutubeSearch(query: String, maxResults: Int) async throws -> [Entity_YoutubeData] {
+        let dto = try await networkService.fetchYoutubeSearch(query: query, maxResults: maxResults)
         return mapper.transform(dto)
     }
 }

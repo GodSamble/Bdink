@@ -8,7 +8,7 @@
 import Foundation
 
 protocol YoutubeVideosUseCase {
-    func execute(id:String, part: String) async throws -> [Entity_YoutubeData]
+    func execute(query: String, maxResults: Int) async throws -> [Entity_YoutubeData]
 }
 
 final class FetchYoutubeVideosUseCase: YoutubeVideosUseCase {
@@ -19,7 +19,7 @@ final class FetchYoutubeVideosUseCase: YoutubeVideosUseCase {
         self.repositoryInterface_Youtube = repositoryInterface_Youtube
     }
     
-    func execute(id: String, part: String) async throws -> [Entity_YoutubeData] {
-        return try await repositoryInterface_Youtube.fetchYoutubeVideoList(id: id, part: part)
+    func execute(query: String, maxResults: Int) async throws -> [Entity_YoutubeData] {
+        return try await repositoryInterface_Youtube.fetchYoutubeSearch(query: query, maxResults: maxResults)
     }
 }
