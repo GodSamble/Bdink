@@ -7,21 +7,35 @@
 
 import Foundation
 
-
 protocol Mappers_YoutubeData {
-    func transform(_ dto: DTO_SearchData) -> [Entity_YoutubeData]
-}
-
-final class Mappers_YoutubeDataDefault: Mappers_YoutubeData {
-    func transform(_ dto: DTO_SearchData) -> [Entity_YoutubeData] {
-        return dto.items.map { items in
-            // DTO -> Entity 변환
-            Entity_YoutubeData(videoId: items.id.videoID, title: items.snippet.title, thumbnailUrl: items.snippet.thumbnails.default.url, channelId: items.snippet.channelId, channelName: items.snippet.channelTitle, channelThumbnailUrl: items.snippet.thumbnails.high.url
-           
-            )
-        }
-    }
+    func transform(searchDto: DTO_SearchData, videoDto: DTO_YoutubeVideoData, channelDto: DTO_YoutubeChannelData) -> (
+        search: Entity_YoutubeData,
+        video: Entity_YoutubeVideoData,
+        channel: Entity_YoutubeChannelData
+    )
     
 }
 
-
+final class Mappers_YoutubeDataDefault: Mappers_YoutubeData {
+    func transform(searchDto: DTO_SearchData, videoDto: DTO_YoutubeVideoData, channelDto: DTO_YoutubeChannelData) -> (
+        search: Entity_YoutubeData,
+        video: Entity_YoutubeVideoData,
+        channel: Entity_YoutubeChannelData
+    ) {
+        let searchEntity = Entity_YoutubeData(
+            videoId: searchDto.items.first?.id.videoID ?? "",
+            title: searchDto.items.first?.snippet.title ?? "Unknown",
+            thumbnailUrl: searchDto.items.first?.snippet.thumbnails.medium.url ?? "",
+            channelId: searchDto.items.first?.snippet.channelId ?? "",
+            channelName: "Unknown" // 기본값 설정 가능
+        )
+        
+        let videoEntity = Entity_YoutubeVideoData(
+            viewCount: videoDto.items.first?.statistics?.viewCount ?? "0"
+        )
+        let channelEntity = Entity_YoutubeChannelData(
+            channelThumbnailUrl: channelDto.items.first?.snippet.thumbnails.medium.url ?? "" // ✅ 수정
+        )
+        return (search: searchEntity, video: videoEntity, channel: channelEntity)
+    }
+}

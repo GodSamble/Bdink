@@ -8,7 +8,9 @@
 import Foundation
 
 protocol RepositoryInterface_Youtube {
-//    func fetchYoutubeVideoList(id: String, part: String) async throws -> [Entity_YoutubeData]
-    
-    func fetchYoutubeSearch(query: String, maxResults: Int) async throws -> [Entity_YoutubeData]
+    func fetchYoutubeSearch(query: String, maxResults: Int) async throws -> (
+        search: Entity_YoutubeData,
+        video: Entity_YoutubeVideoData,
+        channel: Entity_YoutubeChannelData
+    )
 }

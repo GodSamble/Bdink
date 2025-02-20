@@ -8,8 +8,9 @@ import Foundation
 import Moya
 
 enum API_YoutubeData {
-//    case video(id: String, part: String)
-    case search(query: String, maxResults: Int)
+    case video(ids: [String], part: String)
+    case search(query: String, maxResults: Int) // 수정된 부분
+    case channel(ids: [String], part: String) // 채널 ID도 추가
 }
 
 extension API_YoutubeData: TargetType {
@@ -19,14 +20,19 @@ extension API_YoutubeData: TargetType {
     
     var task: Moya.Task {
         switch self {
-//        case .video(let id, let part):
-//            return .requestParameters(
-//                parameters: commonParameters(id: id, part: part),
-//                encoding: URLEncoding.default
-//            )
-        case .search(let query, let maxResults):
+        case .video(let ids, let part):
             return .requestParameters(
-                parameters: searchParameters(query: query, maxResults: maxResults),
+                parameters: commonParameters(ids: ids, part: part),
+                encoding: URLEncoding.default
+            )
+        case .channel(let ids, let part):
+            return .requestParameters(
+                parameters: commonParameters(ids: ids, part: part),
+                encoding: URLEncoding.default
+            )
+        case .search(let query, let maxResults): // 수정된 부분
+            return .requestParameters(
+                parameters: searchParameters(query: query, maxResults: maxResults), // 수정된 부분
                 encoding: URLEncoding.default
             )
         }
@@ -44,31 +50,40 @@ extension API_YoutubeData: TargetType {
     
     var path: String {
         switch self {
-//        case .video:
-//            return "/videos"
+        case .video:
+            return "/videos"
         case .search:
             return "/search"
+        case .channel:
+            return "/channels"
         }
     }
     
-    private func commonParameters(id: String, part: String) -> [String: Any] {
+    private func commonParameters(ids: [String], part: String) -> [String: Any] {
         return [
-            "key": fetchAPIKey(), // 보안 파일에서 API 키 가져오기
-            "id": id, // 비디오 ID
-            "part": part // 반환할 데이터 유형 (예: "snippet", "contentDetails", "statistics" 등)
+            "key": fetchAPIKey(),
+            "id": ids.joined(separator: ","),
+            "part": part
         ]
     }
     
-    private func searchParameters(query: String, maxResults: Int) -> [String: Any] {
+    private func searchParameters(query: String, maxResults: Int) -> [String: Any] { // 수정된 부분
         return [
-            "key": fetchAPIKey(), // 보안 파일에서 API 키 가져오기
-            "q": query, // 검색어 (ex: "트포이")
-            "part": "snippet", // 기본 정보 포함
-            "type": "video", // 비디오만 검색
-            "videoDuration": "short", // Shorts (60초 이하)
-            "order": "viewCount", // 조회수 기준 정렬
-            "regionCode": "KR", // 한국 인기 영상
-            "maxResults": maxResults // 최대 가져올 영상 수
+            "key": fetchAPIKey(),
+            "q": query, // 따옴표 빼야하나
+            "part": "snippet",
+            "type": "video",
+            "videoDuration": "short",
+            "order": "viewCount",
+            "regionCode": "KR",
+            "maxResults": maxResults // 따옴표 빼야하나
+        ]
+    }
+    
+    private func commonParameters(part: String) -> [String: Any] {
+        return [
+            "key": fetchAPIKey(),
+            "part": part
         ]
     }
     

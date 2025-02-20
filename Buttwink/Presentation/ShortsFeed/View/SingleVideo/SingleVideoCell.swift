@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import RxSwift
+import RxCocoa
 
 struct ContentView: View {
     let videoURLs: [String] = [
@@ -15,40 +17,78 @@ struct ContentView: View {
     ]
     
     @State private var currentVisibleIndex: Int = 0
+    @State private var selectedVideoURL: String? = nil
+    @State private var isNavigating: Bool = false
+    @State private var selectedVideo: String
+    
+    init(selectedVideo: String) {
+        self._selectedVideo = State(initialValue: selectedVideo)
+    }
     
     var body: some View {
-        PagingScrollView(count: videoURLs.count) {
-            LazyVStack(spacing: 0) {
-                ForEach(videoURLs.indices, id: \.self) { index in
-                    GeometryReader { geometry in
-                        if isViewVisible(geometry: geometry) {
-                            ShortsView(
-                                viewModel: ShortsViewModel(contentURL: videoURLs[index]),
-                                isPlaying: Binding<Bool>(
-                                    get: { self.currentVisibleIndex == index },
-                                    set: { newValue in
-                                        if newValue {
-                                            self.currentVisibleIndex = index
-                                            preloadAdjacentVideos(currentIndex: index)
+        NavigationStack {
+            SingleVideoView(count: videoURLs.count) {
+                LazyVStack(spacing: 0) {
+                    ForEach(videoURLs.indices, id: \.self) { index in
+                        GeometryReader { geometry in
+                            if isViewVisible(geometry: geometry) {
+                                ShortsView(
+                                    viewModel: SingleVideoViewModel(contentURL: videoURLs[index]),
+                                    isPlaying: Binding<Bool>(
+                                        get: { self.currentVisibleIndex == index },
+                                        set: { newValue in
+                                            if newValue {
+                                                self.currentVisibleIndex = index
+                                                preloadAdjacentVideos(currentIndex: index)
+                                            }
                                         }
-                                    }
+                                    )
                                 )
-                            )
-                            .allowsHitTesting(false)
-                            .frame(height: UIScreen.main.bounds.height)
-                        } else {
-                            Color.clear.frame(height: UIScreen.main.bounds.height)
+                                .onTapGesture {
+                                    // 썸네일 클릭 시 URL을 selectedVideoURL에 할당
+                                    Task {
+                                        await updateSelectedVideoURL(with: videoURLs[index])
+                                    }
+                                }
+                                .frame(height: UIScreen.main.bounds.height)
+                            } else {
+                                Color.clear.frame(height: UIScreen.main.bounds.height)
+                            }
                         }
+                        .frame(height: UIScreen.main.bounds.height)
                     }
-                    .frame(height: UIScreen.main.bounds.height)
                 }
+                .ignoresSafeArea()
             }
             .ignoresSafeArea()
+            .onAppear {
+                preloadAdjacentVideos(currentIndex: 0)
+            }
+            .background(
+                // NavigationLink는 화면을 트리거하고, `isNavigating`이 true일 때 활성화됨
+                NavigationLink(
+                    destination: ShortsView(
+                        viewModel: SingleVideoViewModel(contentURL: selectedVideo ?? ""),
+                        isPlaying: .constant(true)
+                    ),
+                    isActive: $isNavigating
+                ) {
+                    EmptyView()
+                }
+                    .hidden()
+            )
+            .navigationDestination(isPresented: $isNavigating) {
+                // 네비게이션이 트리거되었을 때 해당 비디오로 이동
+                //                if let selectedVideo = selectedVideo {  // 비디오 URL이 있을 때만 네비게이션
+                //                      ShortsView(viewModel: SingleVideoViewModel(contentURL: selectedVideo), isPlaying: .constant(true))
+                //                  }🟩🟩🟩
+            }
         }
-        .ignoresSafeArea()
-        .onAppear {
-            preloadAdjacentVideos(currentIndex: 0)
-        }
+    }
+    
+    private func navigateToVideoPlayer(with videoURL: String) {
+        self.selectedVideoURL = videoURL
+        self.isNavigating = true // Navigation 활성화
     }
     
     private func isViewVisible(geometry: GeometryProxy) -> Bool {
@@ -61,10 +101,16 @@ struct ContentView: View {
         let nextIndex = min(videoURLs.count - 1, currentIndex + 1)
         
         if prevIndex != currentIndex {
-            ShortsViewModel.preloadPlayer(for: videoURLs[prevIndex])
+            SingleVideoViewModel.preloadPlayer(for: videoURLs[prevIndex])
         }
         if nextIndex != currentIndex {
-            ShortsViewModel.preloadPlayer(for: videoURLs[nextIndex])
+            SingleVideoViewModel.preloadPlayer(for: videoURLs[nextIndex])
         }
+    }
+    
+    private func updateSelectedVideoURL(with videoURL: String) async {
+        selectedVideo = videoURL
+        selectedVideoURL = videoURL
+        isNavigating = true // 네비게이션 활성화
     }
 }

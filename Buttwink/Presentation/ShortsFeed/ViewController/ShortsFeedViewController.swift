@@ -22,25 +22,28 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
     let itemsSet: Set<DetailInfoSectionItem> = [
         .Tag(["Swift"]),
         .Thumbnail([]),
-        .Third([UIImage()])
+        .Third([UIImage()]),
+        .Lecture([UIImage()])
     ]
-
+    
     // 예를 들어, Thumbnail 타입만 필터링
     var filteredItems: [DetailInfoSectionItem] {
         itemsSet.filter {
             switch $0 {
-            case .Thumbnail, .Tag, .Third:
+            case .Thumbnail, .Tag, .Third, .Lecture:
                 return true
             default:
                 return false
             }
-         
+            
         }
     }
     
+    private let selectedVideoURL = PublishRelay<String>()
+    
     var uniqueItems: Set<DetailInfoSectionItem> = []
     let categoryViewModel = CategoryVideosViewModel()
-//    let tagNames: [String] = ["NPC", "WNGP", "NABBA"]
+    //    let tagNames: [String] = ["NPC", "WNGP", "NABBA"]
     let thirdImages: [UIImage] = [
         UIImage.Icon.alarm_default!,
         UIImage.Icon.feed!,
@@ -66,6 +69,7 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         collectionView.register(TagCell.self, forCellWithReuseIdentifier: TagCell.identifier)
         collectionView.register(ThumbnailCell.self, forCellWithReuseIdentifier: ThumbnailCell.identifier)
         collectionView.register(ThirdCell.self, forCellWithReuseIdentifier: ThirdCell.identifier)
+        collectionView.register(LectureCell.self, forCellWithReuseIdentifier: LectureCell.identifier)
         collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderView.identifier)
         collectionView.isScrollEnabled = true
         return collectionView
@@ -78,15 +82,14 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         let youtubeMapper = DetailInfoSectionMapperImpl()
         
         let repository = Repository_Youtube(networkService: networkService, mapper: youtubeMapper as! Mappers_YoutubeData)
-        let youtubeUseCase = FetchYoutubeVideosUseCase(
-            repositoryInterface_Youtube: repository
-        )
+        let youtubeUseCase = FetchUnifiedYoutubeDataUseCaseImpl(repositoryInterface_Youtube: repository)
         let youtubePresentationMapper = DetailInfoSectionMapperImpl()
         let viewModel = ShortsFeedViewModel(
             youtubeUseCase: youtubeUseCase,
             youtubeMapper: youtubePresentationMapper
         )
         self.init(viewModel: viewModel)
+        
     }
     
     init(viewModel: ShortsFeedViewModel!) {
@@ -111,27 +114,43 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
             print("API 키가 설정되지 않았습니다.")
         }
         
+        if let apiKey = ProcessInfo.processInfo.environment["YOUTUBE_API_KEY"] {
+            print("API Key Loaded: \(apiKey)")
+        } else {
+            print("API Key Not Found!")
+        }
+        
         // 초기 더미 데이터로 캐시된 데이터 로드 (빠르게 UI 렌더링)
-//        viewModel.dataSource.accept(viewModel.dummyData)
+        //        viewModel.dataSource.accept(viewModel.dummyData)
         fetchNewData()
-//        viewModel.inputs.viewDidLoad.accept(())
-//        viewModel.bind()
+        //        viewModel.inputs.viewDidLoad.accept(())
+        //        viewModel.bind()
         
         // 기본 스냅샷 업데이트 (기존 데이터로 UI 초기화)
         updateSnapshot(with: viewModel.dummyData)
         
         // 비동기적으로 새로운 데이터를 받아온 후 업데이트
-
+        
+        // ✅ 선택된 URL을 구독하여 화면 전환
+        selectedVideoURL
+            .subscribe(onNext: { [weak self] videoURL in
+                self?.navigateToVideoPlayer(with: videoURL)
+            })
+            .disposed(by: disposeBag)
+        
     }
     
     // MARK: - Binding & Network
     
     func fetchNewData() {
         let query = "트포이"
-        let maxResults = 20
+        let maxResults = 5
+        let videoPart = "snippet,statistics,contentDetails" // 비디오 데이터 상세 정보 포함
+        let ids = ["S3KEgDlkxC8", "dQw4w9WgXcQ"] // 특정 비디오 ID
+        let channelPart = "snippet,statistics" // 채널 정보 포함
         
         //        viewModel.fetchYoutube(videoIDs: videoIDs, part: part)
-        viewModel.fetchYoutube(query: query, maxResults: maxResults)
+        viewModel.fetchYoutube(query: query, maxResults: maxResults, videoPart: videoPart, channelPart: channelPart, ids: ids)
             .subscribe(onNext: { [weak self] newData in
                 self?.updateSnapshot(with: newData)
             })
@@ -147,8 +166,10 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
             .disposed(by: disposeBag)
         
         viewModel.outputs.dataSource
-            .subscribe(onNext: { data in
-                print("Received data: \(data)")
+            .filter { !$0.isEmpty } // ✅ 비어 있으면 이벤트 방지
+            .take(1) // ✅ 처음 한 번만 실행되도록 제한
+            .subscribe(onNext: { _ in
+                print("✅ DataSource 업데이트 완료")
             })
             .disposed(by: disposeBag)
         
@@ -161,6 +182,39 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
             .subscribe(onNext: { [weak self] error in
             })
             .disposed(by: disposeBag)
+        
+        //        collectionView.rx.itemSelected
+        //            .subscribe(onNext: { [weak self] indexPath in
+        //                guard let self = self else { return }
+        //                let dataSource = self.viewModel.outputs.dataSource.value
+        //
+        //                if dataSource.isEmpty {
+        //                            print("🚨 데이터가 아직 로드되지 않음! indexPath: \(indexPath)")
+        //                            return
+        //                        }
+        //
+        //                guard indexPath.item < dataSource.count else {
+        //                            print("❌ Index out of range: \(indexPath.item), available: \(dataSource.count)")
+        //                            return
+        //                        }
+        //                let item = dataSource[indexPath.item]
+        //                       if case let .Thumbnail(thumbnails) = item, let firstThumbnail = thumbnails.first {
+        //                           print("✅ Thumbnail tapped: \(firstThumbnail.videoId)")
+        //                           self.viewModel.thumbnailTapped.accept(firstThumbnail.videoId!)
+        //                       }
+        //            })
+        //            .disposed(by: disposeBag)
+        
+        viewModel.thumbnailTapped
+            .subscribe(onNext: { [weak self] videoId in
+                self?.openYoutube(videoId: videoId)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func openYoutube(videoId: String) {
+        let youtubeURL = URL(string: "https://www.youtube.com/watch?v=\(videoId)")!
+        UIApplication.shared.open(youtubeURL, options: [:], completionHandler: nil)
     }
     
     var dataSourceBinder: Binder<[DetailInfoSectionItem]> {
@@ -183,13 +237,17 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
                     items = images.map { DetailInfoSectionItem.Thumbnail([$0])}
                 case .Third(let strings):
                     items = strings.map { DetailInfoSectionItem.Third([$0]) }
+                case .Lecture(let strings):
+                    items = strings.map {
+                        DetailInfoSectionItem.Lecture([$0])
+                    }
                 }
                 currentSnapshot.appendItems(items, toSection: section)
             }
             view.dataSource.apply(currentSnapshot, animatingDifferences: true)
         }
     }
-
+    
     
     // MARK: - Data Source
     
@@ -234,7 +292,10 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
                     }
                     let dynamicCount = indexPath.row % self.viewModel.dummyData.count + 1
                     if !data.isEmpty {
-                        cell.configure(with: data, with: dynamicCount)
+                        cell.configure(with: data)
+                        cell.thumbnailTapped
+                            .bind(to: self.selectedVideoURL)
+                            .disposed(by: cell.disposeBag)
                     } else {
                         return UICollectionViewCell()
                     }
@@ -246,6 +307,16 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
                         withReuseIdentifier: ThirdCell.identifier,
                         for: indexPath
                     ) as? ThirdCell else {
+                        return nil
+                    }
+                    let dynamicCount = indexPath.row % self.viewModel.dummyData.count + 1
+                    cell.configure(with: self.thirdImages, with: dynamicCount)
+                    return cell
+                case .Lecture(_):
+                    guard let cell = collectionView.dequeueReusableCell(
+                        withReuseIdentifier: LectureCell.identifier,
+                        for: indexPath
+                    ) as? LectureCell else {
                         return nil
                     }
                     let dynamicCount = indexPath.row % self.viewModel.dummyData.count + 1
@@ -291,17 +362,19 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
                 items = videoItem.map { DetailInfoSectionItem.Thumbnail([$0]) } // ✅ 개별 썸네일 분리
             case .Third(let strings):
                 items = strings.map { DetailInfoSectionItem.Third([$0]) } // ✅ 개별 문자열 분리
+            case .Lecture(let strings):
+                items = strings.map { DetailInfoSectionItem.Lecture([$0])}
             }
             uniqueItems.formUnion(items)
-//            snapshot.appendItems(items, toSection: section)
+            //            snapshot.appendItems(items, toSection: section)
         }
         
         for section in SectionLayoutKind.allCases {
             let filteredItems = Array(uniqueItems).filter { $0.getSectionLayoutKind() == section }
             snapshot.appendItems(filteredItems, toSection: section)
         }
-      
-//        snapshotRelay.accept(snapshot)
+        
+        //        snapshotRelay.accept(snapshot)
         dataSource.apply(snapshot, animatingDifferences: true)
     }
     
@@ -334,11 +407,13 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
                 return self?.createThumbnailCellSection(withHeader: false)
             case .thirdSection:
                 return self?.createThridSection(withHeader: true)
+            case .lecture:
+                return self?.createLectureSection(withHeader: true)
             }
         }
         return layout
     }
-
+    
     func updateSnapshotWithItems() {
         // 현재 스냅샷에 .thumbnails 섹션이 존재하는지 확인
         if currentSnapshot.sectionIdentifiers.contains(.tags) == false {
@@ -357,12 +432,18 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
             currentSnapshot.appendSections([.thirdSection])
         }
         
+        if currentSnapshot.sectionIdentifiers.contains(.lecture) == false {
+            currentSnapshot.appendSections([.lecture])
+        }
+        
         currentSnapshot.appendItems(viewModel.outputs.dataSource.value, toSection: .tags)
         // .third 섹션에 헤더가 추가되는 경우, 헤더를 true로 설정 (헤더가 추가되도록)
         currentSnapshot.appendItems(viewModel.outputs.dataSource.value, toSection: .thirdSection)
         
         // .thumbnails 섹션에 아이템을 추가하는 방식
         currentSnapshot.appendItems(viewModel.outputs.dataSource.value, toSection: .videoItem)
+        
+        currentSnapshot.appendItems(viewModel.outputs.dataSource.value, toSection: .lecture)
         
         // 변경된 스냅샷을 데이터 소스에 적용
         dataSource.apply(currentSnapshot, animatingDifferences: true)
@@ -403,7 +484,7 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .estimated(2000),
+            widthDimension: .estimated(1500),
             heightDimension: .estimated(356)
         )
         let group = NSCollectionLayoutGroup.horizontal(
@@ -430,14 +511,14 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
     
     private func createThridSection(withHeader: Bool) -> NSCollectionLayoutSection { // ✅
         let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .fractionalHeight(1.0)
+            widthDimension: .estimated(174),
+            heightDimension: .estimated(200)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .absolute(169),
-            heightDimension: .estimated(169)
+            widthDimension: .absolute(174),
+            heightDimension: .estimated(200)
         )
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
@@ -445,7 +526,7 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         )
         
         let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 13
+        section.interGroupSpacing = 10
         section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 22, bottom: 0, trailing: 22)
         section.orthogonalScrollingBehavior = .continuous
         
@@ -460,23 +541,43 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         
         return section
     }
-    
+    private func createLectureSection(withHeader: Bool) -> NSCollectionLayoutSection { // ✅
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .fractionalHeight(1.0)
+        )
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .absolute(200),
+            heightDimension: .estimated(110+80)
+        )
+        let group = NSCollectionLayoutGroup.horizontal(
+            layoutSize: groupSize,
+            subitems: [item]
+        )
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = 10
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 22, bottom: 0, trailing: 22)
+        section.orthogonalScrollingBehavior = .continuous
+        
+        if withHeader {
+            let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                    heightDimension: .estimated(40))
+            let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
+                                                                     elementKind: UICollectionView.elementKindSectionHeader,
+                                                                     alignment: .top)
+            section.boundarySupplementaryItems = [header]
+        }
+        
+        return section
+    }
     // MARK: 화면전환(w.델리게이트)
     
-    //    func didTapHeaderButton() {
-    //        let categoryVC = CategoryVideosViewController(viewModel: categoryViewModel)
-    //        navigationController?.pushViewController(categoryVC, animated: true)
-    //    }
-    
     func didTapHeaderButton() {
-        // ContentView 생성
-        let contentView = ContentView()
-        
-        // PagingScrollView 초기화
-        let pagingScrollView = UIHostingController(rootView: contentView)
-        
-        // 네비게이션 컨트롤러로 푸시
-        navigationController?.pushViewController(pagingScrollView, animated: true)
+        let categoryVC = CategoryVideosViewController(viewModel: categoryViewModel)
+        navigationController?.pushViewController(categoryVC, animated: true)
     }
     
     func getButtonType(from buttonName: String) -> ButtonType {
@@ -487,6 +588,12 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         } else {
             return .NABBA
         }
+    }
+    
+    private func navigateToVideoPlayer(with videoURL: String) {
+        let videoPlayerView = ContentView(selectedVideo: videoURL)
+        let hostingController = UIHostingController(rootView: videoPlayerView)
+        self.navigationController?.pushViewController(hostingController, animated: true)
     }
 }
 

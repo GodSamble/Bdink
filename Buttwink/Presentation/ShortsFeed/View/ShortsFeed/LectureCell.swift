@@ -1,8 +1,8 @@
 //
-//  ThirdCell.swift
+//  LectureCell.swift
 //  Buttwink
 //
-//  Created by 고영민 on 11/28/24.
+//  Created by 고영민 on 2/17/25.
 //
 
 import UIKit
@@ -11,11 +11,11 @@ import RxCocoa
 import SnapKit
 import DesignSystem
 
-final class ThirdCell: BaseCollectionViewCell<Any> {
+final class LectureCell: BaseCollectionViewCell<Any> {
     
     // MARK: - Property
     
-    static let identifier: String = "ThirdCell"
+    static let identifier: String = "LectureCell"
     private var bag = DisposeBag()
     private var isBookmarked = BehaviorRelay<Bool>(value: false)
     
@@ -38,18 +38,50 @@ final class ThirdCell: BaseCollectionViewCell<Any> {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.setText("월 999만원 자동수익, 경제적 자유얻는 구체적 가이드 라인", attributes: .init(style: .detail, weight: .medium, textColor: .buttwink_gray0))
+        label.setText("여성의 골반과 고관절 어쩌구", attributes: .init(style: .detail, weight: .medium, textColor: .buttwink_gray0))
         label.textAlignment = .left
         label.numberOfLines = 2
         return label
     }()
     
-    private let makerLabel: UILabel = {
+    private let maker_totalLectureNum_Label: UILabel = {
         let label = UILabel()
-        label.setText("창업, 부업 | 선한부자 오가닉", attributes: .init(style: .detail, weight: .medium, textColor: .buttwink_gray0))
+        label.setText("지니킴 교수님 | 총 16강", attributes: .init(style: .detail, weight: .medium, textColor: .buttwink_gray0))
         label.textAlignment = .left
         label.numberOfLines = 1
         return label
+    }()
+    
+    private let discountLabel: UILabel = {
+        let label = UILabel()
+        label.setText("20%", attributes: .init(style: .detail, weight: .medium, textColor: .red))
+        label.textAlignment = .left
+        label.numberOfLines = 1
+        return label
+    }()
+    
+    private let priceLabel: UILabel = {
+        let label = UILabel()
+        label.setText("월 66,700원", attributes: .init(style: .detail, weight: .medium, textColor: .buttwink_gray0))
+        label.textAlignment = .left
+        label.numberOfLines = 1
+        return label
+    }()
+    
+    private let period_reviewNum_Label: UILabel = {
+        let label = UILabel()
+        label.setText("(3개월) | 리뷰수(23)", attributes: .init(style: .detail, weight: .medium, textColor: .buttwink_gray0))
+        label.textAlignment = .left
+        label.numberOfLines = 1
+        return label
+    }()
+    
+    private let lectureInfoStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 4
+        stackView.alignment = .center
+        return stackView
     }()
     
     // MARK: - Life Cycle
@@ -71,33 +103,43 @@ final class ThirdCell: BaseCollectionViewCell<Any> {
     // MARK: - Methods
     
     private func setLayout() {
+        
         self.addSubview(imageView)
-        imageView.snp.makeConstraints { make in
+        self.imageView.snp.makeConstraints { make in
             make.leading.equalToSuperview()
             make.horizontalEdges.equalToSuperview()
-            make.height.equalTo(130)
-            make.width.equalTo(174)
+            make.height.equalTo(110)
+            make.width.equalTo(200)
         }
         
-        self.imageView.addSubviews(bookmarkButton, titleLabel)
+        lectureInfoStackView.addArrangedSubview(discountLabel)
+        lectureInfoStackView.addArrangedSubview(priceLabel)
+        lectureInfoStackView.addArrangedSubview(period_reviewNum_Label)
+        
+        self.addSubviews(bookmarkButton, titleLabel, maker_totalLectureNum_Label, lectureInfoStackView)
+        
         bookmarkButton.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(12)
-            make.trailing.equalToSuperview().inset(14)
+            make.top.equalTo(imageView.snp.top).inset(12)
+            make.trailing.equalTo(imageView.snp.trailing).inset(14)
             make.width.equalTo(24)
             make.height.equalTo(24)
         }
-        self.titleLabel.addSubview(makerLabel)
         
-        self.titleLabel.snp.makeConstraints { make in
+        titleLabel.snp.makeConstraints { make in
             make.top.equalTo(imageView.snp.bottom).offset(7)
-            make.leading.equalToSuperview()
+            make.leading.equalTo(imageView.snp.leading)
             make.width.equalTo(imageView.snp.width)
         }
         
-        self.makerLabel.snp.makeConstraints { make in
+        maker_totalLectureNum_Label.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(2)
-            make.leading.equalToSuperview()
+            make.leading.equalTo(imageView.snp.leading)
             make.width.equalTo(titleLabel.snp.width)
+        }
+        
+        lectureInfoStackView.snp.makeConstraints { make in
+            make.leading.equalTo(imageView.snp.leading)
+            make.top.equalTo(maker_totalLectureNum_Label.snp.bottom).offset(10)
         }
     }
     
@@ -116,17 +158,14 @@ final class ThirdCell: BaseCollectionViewCell<Any> {
             .disposed(by: bag)
     }
     
+    
     public func configure(with images: [UIImage], with count: Int) {
         guard !images.isEmpty, count > 0 else {
             print("No images to configure.")
             return
         }
-        
-        // index 계산 시 count와 배열의 크기를 고려
         let imageIndex = min(count - 1, images.count - 1)
         let selectedImage = images[imageIndex]
-        
-        // 이미지 뷰에 이미지 설정
         self.imageView.image = selectedImage
     }
 }

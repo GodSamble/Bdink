@@ -13,19 +13,21 @@ import UIKit
 enum DetailInfoSectionItem: Hashable, Equatable {
     
     case Tag([String])
-    case Thumbnail([Entity_YoutubeData])
+    case Thumbnail([UnifiedYoutubeEntity])
     case Third([UIImage])
+    case Lecture([UIImage])
     
     public func getSectionLayoutKind() -> SectionLayoutKind {
         switch self {
         case .Tag: return .tags
         case .Thumbnail: return .videoItem
         case .Third: return .thirdSection
+        case .Lecture: return .lecture
         }
     }
 }
 // MARK: - Item
 
 enum SectionLayoutKind: Int, CaseIterable, Hashable {
-    case tags, videoItem, thirdSection
+    case tags, videoItem, thirdSection, lecture
 }

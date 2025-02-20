@@ -9,7 +9,7 @@ import UIKit
 import SwiftUI
 import SnapKit
 
-public struct PagingScrollView<Content: View>: UIViewRepresentable {
+struct SingleVideoView<Content: View>: UIViewRepresentable { // PagingScrollView
     private var count: Int
     private var content: () -> Content
     
@@ -61,10 +61,10 @@ public struct PagingScrollView<Content: View>: UIViewRepresentable {
     }
     
     public class Coordinator: NSObject, UIScrollViewDelegate {
-        var parent: PagingScrollView
+        var parent: SingleVideoView
         var hostingController = UIHostingController<Content?>(rootView: nil)
         
-        init(_ parent: PagingScrollView) {
+        init(_ parent: SingleVideoView) {
             self.parent = parent
         }
     }

@@ -34,9 +34,9 @@ final class DIContainer {
         
         
         // UseCase_test 등록
-        container.register(YoutubeVideosUseCase.self) { resolver in
+        container.register(FetchUnifiedYoutubeDataUseCase.self) { resolver in
             let repository = resolver.resolve(RepositoryInterface_Youtube.self)!
-            return FetchYoutubeVideosUseCase(repositoryInterface_Youtube: repository)
+            return FetchUnifiedYoutubeDataUseCaseImpl(repositoryInterface_Youtube: repository)
         }
         
         // MypageMapper 등록
@@ -46,7 +46,7 @@ final class DIContainer {
         
         // ShortsFeedViewModel 등록
         container.register(ShortsFeedViewModel.self) { resolver in
-            guard let useCase = resolver.resolve(YoutubeVideosUseCase.self) else {
+            guard let useCase = resolver.resolve(FetchUnifiedYoutubeDataUseCase.self) else {
                 fatalError("Failed to resolve YoutubeVideosUseCase") // UseCase가 없으면 앱 종료
             }
             

@@ -12,15 +12,11 @@ struct Entity_YoutubeShorts {
     let videoId: String            // 영상 URL을 만들기 위한 ID
     let title: String              // 영상 제목
     let thumbnailUrl: String       // 쇼츠 썸네일 URL
-    let firstComment: String?      // 첫 번째 댓글 (선택적)
+//    let firstComment: String?      // 첫 번째 댓글 (선택적)
     let channelId: String          // 채널 ID
     let channelName: String        // 채널 이름
     let channelThumbnailUrl: String // 채널 프로필 사진
 }
-
-
-
-
 
 // MARK: - 공통 엔티티 (Shared Entities)
 struct PageInfo: Codable, Hashable {
@@ -80,9 +76,7 @@ struct Statistics: Codable, Hashable {
 }
 
 // MARK: - ContentRating (Video API 전용)
-struct ContentRating: Codable, Hashable {
-    // 필요한 경우 추가 필드 정의
-}
+struct ContentRating: Codable, Hashable {}
 
 // MARK: - YoutubeSearch (Search API)
 struct DTO_SearchData: Codable {
@@ -116,4 +110,53 @@ enum IDKind: String, Codable {
 
 enum ItemKind: String, Codable {
     case youtubeSearchResult = "youtube#searchResult"
+}
+
+// MARK: - DTO_YoutubeChannelData (Channels API)
+struct DTO_YoutubeChannelData: Codable, Hashable {
+    let kind, etag: String
+    let items: [ChannelItem]
+}
+
+// MARK: - ChannelItem (Channels API 전용)
+struct ChannelItem: Codable, Hashable {
+    let id: String
+    let snippet: ChannelSnippet
+    let statistics: ChannelStatistics?
+}
+
+// MARK: - ChannelSnippet (채널 정보)
+struct ChannelSnippet: Codable, Hashable {
+    let title: String
+    let description: String
+    let thumbnails: Thumbnails
+    let publishedAt: String
+}
+
+// MARK: - ChannelStatistics (채널 통계)
+struct ChannelStatistics: Codable, Hashable {
+    let viewCount: String?
+    let subscriberCount: String?
+    let hiddenSubscriberCount: Bool?
+    let videoCount: String?
+}
+
+
+// MARK: - DTO_YoutubeVideoData (Video API)
+struct DTO_YoutubeVideoData: Codable, Hashable {
+    let kind, etag: String
+    let items: [VideoItemDetails]
+    let pageInfo: PageInfo
+}
+
+// MARK: - VideoItemDetails (Video API 전용)
+struct VideoItemDetails: Codable, Hashable {
+    let kind, etag, id: String
+    let snippet: Snippet
+    let statistics: VideoStatistics?
+}
+
+// MARK: - VideoStatistics (Video API 전용)
+struct VideoStatistics: Codable, Hashable {
+    let viewCount: String?
 }
