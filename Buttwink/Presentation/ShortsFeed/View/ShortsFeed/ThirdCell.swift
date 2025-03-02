@@ -75,8 +75,8 @@ final class ThirdCell: BaseCollectionViewCell<Any> {
         imageView.snp.makeConstraints { make in
             make.leading.equalToSuperview()
             make.horizontalEdges.equalToSuperview()
-            make.height.equalTo(130)
-            make.width.equalTo(174)
+            make.height.equalTo(115) //130
+            make.width.equalTo(154) // 174
         }
         
         self.imageView.addSubviews(bookmarkButton, titleLabel)

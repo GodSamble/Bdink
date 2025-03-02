@@ -478,14 +478,14 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
     
     private func createThumbnailCellSection(withHeader: Bool) -> NSCollectionLayoutSection { //✅
         let itemSize = NSCollectionLayoutSize(
-            widthDimension: .estimated(270),
+            widthDimension: .estimated(141),
             heightDimension: .fractionalHeight(1.0)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .estimated(1500),
-            heightDimension: .estimated(356)
+            heightDimension: .estimated(188)
         )
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
@@ -511,14 +511,14 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
     
     private func createThridSection(withHeader: Bool) -> NSCollectionLayoutSection { // ✅
         let itemSize = NSCollectionLayoutSize(
-            widthDimension: .estimated(174),
-            heightDimension: .estimated(200)
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .fractionalHeight(1.0)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .absolute(174),
-            heightDimension: .estimated(200)
+            widthDimension: .absolute(155),
+            heightDimension: .estimated(110+85+30) // +5 + 30(리뷰수추가)
         )
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
@@ -526,7 +526,7 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         )
         
         let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 10
+        section.interGroupSpacing = 8
         section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 22, bottom: 0, trailing: 22)
         section.orthogonalScrollingBehavior = .continuous
         
@@ -549,8 +549,8 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .absolute(200),
-            heightDimension: .estimated(110+80)
+            widthDimension: .absolute(155),
+            heightDimension: .estimated(110+85+30) // +5 + 30(리뷰수추가)
         )
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
@@ -558,7 +558,7 @@ final class ShortsFeedViewController: UIViewController, UICollectionViewDelegate
         )
         
         let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 10
+        section.interGroupSpacing = 8
         section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 22, bottom: 0, trailing: 22)
         section.orthogonalScrollingBehavior = .continuous
         

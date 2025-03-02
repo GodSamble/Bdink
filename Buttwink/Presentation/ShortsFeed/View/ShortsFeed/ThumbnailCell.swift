@@ -24,6 +24,7 @@ final class ThumbnailCell: BaseCollectionViewCell<Any> {
     private let imageView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
+        view.backgroundColor = .lightGray
         view.clipsToBounds = true
         view.isUserInteractionEnabled = true
         return view
@@ -74,8 +75,8 @@ final class ThumbnailCell: BaseCollectionViewCell<Any> {
         
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-            make.height.equalTo(356)
-            make.width.equalTo(270)
+            make.height.equalTo(188)
+            make.width.equalTo(141)
         }
         titleLabel.snp.makeConstraints { make in
             make.bottom.leading.equalToSuperview().inset(13)

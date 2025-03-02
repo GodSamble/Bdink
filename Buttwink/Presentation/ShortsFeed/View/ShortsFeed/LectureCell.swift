@@ -62,18 +62,42 @@ final class LectureCell: BaseCollectionViewCell<Any> {
     
     private let priceLabel: UILabel = {
         let label = UILabel()
-        label.setText("월 66,700원", attributes: .init(style: .detail, weight: .medium, textColor: .buttwink_gray0))
+        label.setText("218,000원", attributes: .init(style: .detail, weight: .medium, textColor: .buttwink_gray0))
         label.textAlignment = .left
         label.numberOfLines = 1
         return label
     }()
     
-    private let period_reviewNum_Label: UILabel = {
+//    private let period_reviewNum_Label: UILabel = {
+//        let label = UILabel()
+//        label.setText("(3개월) | 리뷰수(23)", attributes: .init(style: .detail, weight: .medium, textColor: .buttwink_gray0))
+//        label.textAlignment = .left
+//        label.numberOfLines = 1
+//        return label
+//    }()
+    
+
+    
+    private let reviewLabel: UILabel = {
         let label = UILabel()
-        label.setText("(3개월) | 리뷰수(23)", attributes: .init(style: .detail, weight: .medium, textColor: .buttwink_gray0))
+        label.setText("(16)개 리뷰", attributes: .init(style: .detail, weight: .medium, textColor: .buttwink_gray0))
         label.textAlignment = .left
         label.numberOfLines = 1
         return label
+    }()
+    
+    private let starImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = .Icon.apple
+        return imageView
+    }()
+    
+    private let reviewCountStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 4
+        stackView.alignment = .center
+        return stackView
     }()
     
     private let lectureInfoStackView: UIStackView = {
@@ -108,15 +132,15 @@ final class LectureCell: BaseCollectionViewCell<Any> {
         self.imageView.snp.makeConstraints { make in
             make.leading.equalToSuperview()
             make.horizontalEdges.equalToSuperview()
-            make.height.equalTo(110)
-            make.width.equalTo(200)
+            make.height.equalTo(115) //110
+            make.width.equalTo(154) //200
         }
         
-        lectureInfoStackView.addArrangedSubview(discountLabel)
-        lectureInfoStackView.addArrangedSubview(priceLabel)
-        lectureInfoStackView.addArrangedSubview(period_reviewNum_Label)
+//        lectureInfoStackView.addArrangedSubview(period_reviewNum_Label)
+        lectureInfoStackView.addArrangedSubviews(priceLabel, discountLabel)
+        reviewCountStackView.addArrangedSubviews(starImageView, reviewLabel)
         
-        self.addSubviews(bookmarkButton, titleLabel, maker_totalLectureNum_Label, lectureInfoStackView)
+        self.addSubviews(bookmarkButton, titleLabel, maker_totalLectureNum_Label, lectureInfoStackView, reviewCountStackView)
         
         bookmarkButton.snp.makeConstraints { make in
             make.top.equalTo(imageView.snp.top).inset(12)
@@ -140,6 +164,9 @@ final class LectureCell: BaseCollectionViewCell<Any> {
         lectureInfoStackView.snp.makeConstraints { make in
             make.leading.equalTo(imageView.snp.leading)
             make.top.equalTo(maker_totalLectureNum_Label.snp.bottom).offset(10)
+        }
+        reviewCountStackView.snp.makeConstraints { make in
+            make.top.equalTo(lectureInfoStackView.snp.bottom).offset(10)
         }
     }
     

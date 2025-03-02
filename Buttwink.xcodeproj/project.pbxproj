@@ -76,6 +76,7 @@
 		78956D072D185CBD0074D80B /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 78956D062D185CBD0074D80B /* Then */; };
 		BF0E7A412D62C2220077AC93 /* LectureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0E7A402D62C2220077AC93 /* LectureCell.swift */; };
 		BF3538312D631FB400D80C19 /* CommentModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF3538302D631FB400D80C19 /* CommentModalViewController.swift */; };
+		BF6EB29A2D74ABFB00662BEF /* LectureFooterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF6EB2992D74ABFB00662BEF /* LectureFooterCell.swift */; };
 		BF88F4572D3FA32F00B862F4 /* YouTubePlayerKit in Frameworks */ = {isa = PBXBuildFile; productRef = BF88F4562D3FA32F00B862F4 /* YouTubePlayerKit */; };
 		BF88F4592D3FA42600B862F4 /* SingleVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF88F4582D3FA42600B862F4 /* SingleVideoViewController.swift */; };
 		BF88F45B2D3FA4AF00B862F4 /* SingleVideoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF88F45A2D3FA4AF00B862F4 /* SingleVideoViewModel.swift */; };
@@ -89,8 +90,16 @@
 		BF88F4702D42519800B862F4 /* Usecase_Youtube.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF88F46F2D42519800B862F4 /* Usecase_Youtube.swift */; };
 		BF88F4722D425DFD00B862F4 /* ShortsMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF88F4712D425DFD00B862F4 /* ShortsMapper.swift */; };
 		BF88F4742D425E6A00B862F4 /* ShortsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF88F4732D425E6A00B862F4 /* ShortsModel.swift */; };
+		BF8AC5292D6E9362000FA5FC /* LectureHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF8AC5282D6E9362000FA5FC /* LectureHeaderView.swift */; };
 		BF9132322D5A19190068C9F1 /* CommonRxDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9132312D5A19190068C9F1 /* CommonRxDataSource.swift */; };
 		BF9132342D5B3C4B0068C9F1 /* DTO_YoutubeSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9132332D5B3C4B0068C9F1 /* DTO_YoutubeSearch.swift */; };
+		BFDFF2212D695A3300F67C20 /* LectureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDFF2202D695A3300F67C20 /* LectureViewController.swift */; };
+		BFDFF2262D695A5D00F67C20 /* LectureViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDFF2252D695A5D00F67C20 /* LectureViewModel.swift */; };
+		BFDFF22A2D695A8600F67C20 /* LectureModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDFF2292D695A8600F67C20 /* LectureModel.swift */; };
+		BFDFF22C2D69629300F67C20 /* HeadCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDFF22B2D69629300F67C20 /* HeadCell.swift */; };
+		BFDFF22E2D6962A000F67C20 /* PurchaseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDFF22D2D6962A000F67C20 /* PurchaseCell.swift */; };
+		BFDFF2302D6962A600F67C20 /* ReviewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDFF22F2D6962A600F67C20 /* ReviewCell.swift */; };
+		BFDFF2322D6962AD00F67C20 /* CurriculumCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDFF2312D6962AD00F67C20 /* CurriculumCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -178,6 +187,7 @@
 		1DE7F1BD2D2FF18F00531A95 /* UnderlineSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnderlineSegmentedControl.swift; sourceTree = "<group>"; };
 		BF0E7A402D62C2220077AC93 /* LectureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LectureCell.swift; sourceTree = "<group>"; };
 		BF3538302D631FB400D80C19 /* CommentModalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentModalViewController.swift; sourceTree = "<group>"; };
+		BF6EB2992D74ABFB00662BEF /* LectureFooterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LectureFooterCell.swift; sourceTree = "<group>"; };
 		BF88F4582D3FA42600B862F4 /* SingleVideoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleVideoViewController.swift; sourceTree = "<group>"; };
 		BF88F45A2D3FA4AF00B862F4 /* SingleVideoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleVideoViewModel.swift; sourceTree = "<group>"; };
 		BF88F45D2D3FA4E400B862F4 /* SingleVideoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleVideoCell.swift; sourceTree = "<group>"; };
@@ -190,8 +200,16 @@
 		BF88F46F2D42519800B862F4 /* Usecase_Youtube.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Usecase_Youtube.swift; sourceTree = "<group>"; };
 		BF88F4712D425DFD00B862F4 /* ShortsMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortsMapper.swift; sourceTree = "<group>"; };
 		BF88F4732D425E6A00B862F4 /* ShortsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortsModel.swift; sourceTree = "<group>"; };
+		BF8AC5282D6E9362000FA5FC /* LectureHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LectureHeaderView.swift; sourceTree = "<group>"; };
 		BF9132312D5A19190068C9F1 /* CommonRxDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonRxDataSource.swift; sourceTree = "<group>"; };
 		BF9132332D5B3C4B0068C9F1 /* DTO_YoutubeSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTO_YoutubeSearch.swift; sourceTree = "<group>"; };
+		BFDFF2202D695A3300F67C20 /* LectureViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LectureViewController.swift; sourceTree = "<group>"; };
+		BFDFF2252D695A5D00F67C20 /* LectureViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LectureViewModel.swift; sourceTree = "<group>"; };
+		BFDFF2292D695A8600F67C20 /* LectureModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LectureModel.swift; sourceTree = "<group>"; };
+		BFDFF22B2D69629300F67C20 /* HeadCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadCell.swift; sourceTree = "<group>"; };
+		BFDFF22D2D6962A000F67C20 /* PurchaseCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseCell.swift; sourceTree = "<group>"; };
+		BFDFF22F2D6962A600F67C20 /* ReviewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewCell.swift; sourceTree = "<group>"; };
+		BFDFF2312D6962AD00F67C20 /* CurriculumCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurriculumCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -352,8 +370,8 @@
 		1D7BB1F62CF5C61A0023AC1C /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				BF3538302D631FB400D80C19 /* CommentModalViewController.swift */,
 				1D7BB1F02CF5C5FC0023AC1C /* ShortsFeedViewController.swift */,
+				BF3538302D631FB400D80C19 /* CommentModalViewController.swift */,
 				1D97FE552D350E0C007EB396 /* CategoryVideosViewController.swift */,
 				BF88F4582D3FA42600B862F4 /* SingleVideoViewController.swift */,
 			);
@@ -461,9 +479,10 @@
 		1D999D5D2CE0DB6D004A4029 /* Presentation */ = {
 			isa = PBXGroup;
 			children = (
+				1D7BB1EF2CF5C5ED0023AC1C /* ShortsFeed */,
+				BFDFF21F2D695A2A00F67C20 /* Lecture */,
 				1DE7F1B72D2FF0B000531A95 /* ReuseCell */,
 				1D2E8BCC2D2FE204009F339D /* Bookmark */,
-				1D7BB1EF2CF5C5ED0023AC1C /* ShortsFeed */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -607,6 +626,54 @@
 			path = SingleVideo;
 			sourceTree = "<group>";
 		};
+		BFDFF21F2D695A2A00F67C20 /* Lecture */ = {
+			isa = PBXGroup;
+			children = (
+				BFDFF2282D695A7300F67C20 /* Model */,
+				BFDFF2242D695A4200F67C20 /* View */,
+				BFDFF2232D695A3E00F67C20 /* ViewModel */,
+				BFDFF2222D695A3700F67C20 /* ViewController */,
+			);
+			path = Lecture;
+			sourceTree = "<group>";
+		};
+		BFDFF2222D695A3700F67C20 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				BFDFF2202D695A3300F67C20 /* LectureViewController.swift */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		BFDFF2232D695A3E00F67C20 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				BFDFF2252D695A5D00F67C20 /* LectureViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		BFDFF2242D695A4200F67C20 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				BF8AC5282D6E9362000FA5FC /* LectureHeaderView.swift */,
+				BFDFF22B2D69629300F67C20 /* HeadCell.swift */,
+				BFDFF22D2D6962A000F67C20 /* PurchaseCell.swift */,
+				BFDFF22F2D6962A600F67C20 /* ReviewCell.swift */,
+				BFDFF2312D6962AD00F67C20 /* CurriculumCell.swift */,
+				BF6EB2992D74ABFB00662BEF /* LectureFooterCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		BFDFF2282D695A7300F67C20 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				BFDFF2292D695A8600F67C20 /* LectureModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -746,22 +813,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF6EB29A2D74ABFB00662BEF /* LectureFooterCell.swift in Sources */,
 				1DE7F1BE2D2FF18F00531A95 /* UnderlineSegmentedControl.swift in Sources */,
 				1D5D33962D0D8DA100559069 /* ErrorType.swift in Sources */,
 				1D999D8D2CE115EF004A4029 /* adjusted+.swift in Sources */,
 				1D5D33922D0D8D1500559069 /* HeaderUtils.swift in Sources */,
 				1D999D7B2CE11337004A4029 /* UIView+.swift in Sources */,
+				BFDFF2302D6962A600F67C20 /* ReviewCell.swift in Sources */,
 				1D999D492CE0BADA004A4029 /* ViewController.swift in Sources */,
 				1D8067D62D0078B7002456FD /* URLConstant.swift in Sources */,
 				1D999D912CE11797004A4029 /* TabBarController.swift in Sources */,
 				BF9132342D5B3C4B0068C9F1 /* DTO_YoutubeSearch.swift in Sources */,
 				BF88F4702D42519800B862F4 /* Usecase_Youtube.swift in Sources */,
 				1D8067CE2D0077F8002456FD /* Encodable.swift in Sources */,
+				BFDFF22C2D69629300F67C20 /* HeadCell.swift in Sources */,
 				1D999D872CE1151B004A4029 /* UILabel+.swift in Sources */,
 				1D0D98AA2D07683800ACB167 /* CommonViewModelType.swift in Sources */,
 				1D2E8BDD2D2FE34C009F339D /* BookmarkPosingVC.swift in Sources */,
+				BFDFF2322D6962AD00F67C20 /* CurriculumCell.swift in Sources */,
 				1D8067D22D007856002456FD /* NetworkConstant.swift in Sources */,
+				BF8AC5292D6E9362000FA5FC /* LectureHeaderView.swift in Sources */,
 				BF88F45B2D3FA4AF00B862F4 /* SingleVideoViewModel.swift in Sources */,
+				BFDFF22E2D6962A000F67C20 /* PurchaseCell.swift in Sources */,
 				1D0D98A92D07683800ACB167 /* BaseRxCollectionView.swift in Sources */,
 				1D5D33942D0D8D7000559069 /* GetServiceRx.swift in Sources */,
 				1D999D8B2CE115B8004A4029 /* UITextField+.swift in Sources */,
@@ -770,6 +843,7 @@
 				1D2E8BD92D2FE2AE009F339D /* BookmarkNewsVC.swift in Sources */,
 				BF9132322D5A19190068C9F1 /* CommonRxDataSource.swift in Sources */,
 				1D999D832CE1148F004A4029 /* UIViewController+.swift in Sources */,
+				BFDFF2212D695A3300F67C20 /* LectureViewController.swift in Sources */,
 				1D24D6032CF7F46C006157FD /* ThumbnailCell.swift in Sources */,
 				1D0D98AC2D07683800ACB167 /* ViewModelBindableType.swift in Sources */,
 				BF88F4682D42323500B862F4 /* Mappers_YoutubeData.swift in Sources */,
@@ -777,7 +851,9 @@
 				1D0D98B02D0846F100ACB167 /* Thumbnail.swift in Sources */,
 				1D2E8BE52D2FE800009F339D /* BookmarkCell.swift in Sources */,
 				1D2E8BE32D2FE3D4009F339D /* BookmarkMainVM.swift in Sources */,
+				BFDFF22A2D695A8600F67C20 /* LectureModel.swift in Sources */,
 				1D999D812CE11466004A4029 /* URL+.swift in Sources */,
+				BFDFF2262D695A5D00F67C20 /* LectureViewModel.swift in Sources */,
 				1D0D98A82D07683800ACB167 /* BaseCollectionViewCell.swift in Sources */,
 				BF88F4722D425DFD00B862F4 /* ShortsMapper.swift in Sources */,
 				1D7BB1F32CF5C6020023AC1C /* ShortsFeedViewModel.swift in Sources */,
